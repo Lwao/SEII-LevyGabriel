@@ -1,0 +1,12 @@
+1) Qual o limite de bytes a serem enviados por pacotes TCP e UDP?
+
+Pacotes TCP possuem tamanho de pacotes que variam de um mínimo de 20 bytes até o máximo de 60 bytes. 
+Pacotes UDP possuem um tamanho fixo de 8 bytes para cada pacote.
+
+2) Como um arquivo grande pode ser transmitido via internet?
+
+Para o envio de grandes arquivos pela internet, este pode ser dividido em pacotes de tamanho limitado pelo limite estabelecido pelo protocolo de escolha.
+
+3) Qual a diferença entre as implementações TCP e UDP para esse problema?
+
+Para envio de grande arquivos, o protocolo TCP estabelece a conexão entre o transmissor e receptor, cria solicitações de transferência serialmente e divide os dados em pequenos pacotes que são enviados individualmente pela rede e sem verificação até um limite de não-verificação de pacotes, conhecido com janela TCP. Já o UDP não é tão diferente em relação à divisão em pacotes, porém o UDP não realiza as verificações de erro presentes no three-way-handshake do TCP.
