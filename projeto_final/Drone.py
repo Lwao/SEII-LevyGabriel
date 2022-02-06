@@ -64,14 +64,16 @@ class Drone(pygame.sprite.Sprite):
 
         if(self.angle>0): 
             if(self.in_range['left']): self.rect.x -= inc_x
-            else: self.rect.x += inc_x
+            if self.rect.x<0: self.rect.x=0
         
         if(self.angle<0): 
             if(self.in_range['right']): self.rect.x += inc_x
-            else: self.rect.x -= inc_x
+            if (self.rect.x+self.box[0])>self.range['x']: self.rect.x=self.range['x']-self.box[0]
 
         if ((self.in_range['up']) and (inc_y>0)) or ((self.in_range['down']) and (inc_y<0)): self.rect.y -= inc_y
-        
+        if self.rect.y<0: self.rect.y=0
+        if (self.rect.y+self.box[1])>self.range['y']: self.rect.y=self.range['y']-self.box[1]
+
     def gravity(self):
         if(self.in_range['down']): self.rect.y += 2
             
