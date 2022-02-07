@@ -25,17 +25,18 @@ class Waypoint(pygame.sprite.Sprite):
         self.colision()
 
     def move(self, func_): func_()
+    
     def left(self): 
-        if self.in_range['left']: self.rect.x -= STEP
+        self.rect.x -= STEP
         if self.rect.x<0: self.rect.x=0
     def right(self): 
-        if self.in_range['right']: self.rect.x += STEP
+        self.rect.x += STEP
         if (self.rect.x+2*self.r)>self.range['x']: self.rect.x=self.range['x']-2*self.r
     def up(self): 
-        if self.in_range['up']: self.rect.y -= STEP
+        self.rect.y -= STEP
         if self.rect.y<0: self.rect.y=0
     def down(self): 
-        if self.in_range['down']: self.rect.y += STEP
+        self.rect.y += STEP
         if (self.rect.y+2*self.r)>self.range['y']: self.rect.y=self.range['y']-2*self.r
 
     def colision(self):

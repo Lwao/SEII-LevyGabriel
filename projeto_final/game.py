@@ -36,14 +36,16 @@ while True:
         
     keys = pygame.key.get_pressed()
     
-    if keys[pygame.K_LEFT] or keys[pygame.K_a]: drone.tilt(5)
-    if keys[pygame.K_RIGHT] or keys[pygame.K_d]: drone.tilt(-5)
-    if keys[pygame.K_SPACE] or keys[pygame.K_w]: drone.gas()
+    # if keys[pygame.K_LEFT] or keys[pygame.K_a]: drone.tilt(5)
+    # if keys[pygame.K_RIGHT] or keys[pygame.K_d]: drone.tilt(-5)
+    # if keys[pygame.K_SPACE] or keys[pygame.K_w]: drone.gas()
 
-    # if keys[pygame.K_LEFT] or keys[pygame.K_a]: waypoint.move(waypoint.left)
-    # if keys[pygame.K_RIGHT] or keys[pygame.K_d]: waypoint.move(waypoint.right)
-    # if keys[pygame.K_UP] or keys[pygame.K_w]: waypoint.move(waypoint.up)
-    # if keys[pygame.K_DOWN] or keys[pygame.K_s]: waypoint.move(waypoint.down)
+    if keys[pygame.K_LEFT] or keys[pygame.K_a]: waypoint.move(waypoint.left)
+    if keys[pygame.K_RIGHT] or keys[pygame.K_d]: waypoint.move(waypoint.right)
+    if keys[pygame.K_UP] or keys[pygame.K_w]: waypoint.move(waypoint.up)
+    if keys[pygame.K_DOWN] or keys[pygame.K_s]: waypoint.move(waypoint.down)
+
+    drone.track(waypoint)
 
     sprites.draw(screen)
     sprites.update()
