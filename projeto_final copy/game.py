@@ -1,5 +1,4 @@
 import math
-from re import M
 import pygame
 from pygame.locals import *
 from sys import exit
@@ -8,17 +7,18 @@ from Background import Background
 from Drone import Drone
 from Waypoint import Waypoint
 
-from global_variables import *
-
 pygame.init()
+
+WIDTH, HEIGHT = (800,489)
+FPS = 30
 
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 clock = pygame.time.Clock()
-pygame.display.set_caption(TITLE)
+pygame.display.set_caption('DDAir - Drone Dynamics in the Air')
 
-background = Background('img/background_resized.jpg', (WIDTH,HEIGHT))
-drone = Drone(pd=PIXEL_DENSITY, box_=DRONE_BOX, location_=DRONE_LOCATION, range_=BACKGROUND_INTERACTABLE_RANGE)
-waypoint = Waypoint(range_=BACKGROUND_INTERACTABLE_RANGE)
+background = Background('background_resized.jpg', [0,0], WIDTH, HEIGHT)
+drone = Drone(location_=[WIDTH/2,HEIGHT/2], range_=(WIDTH,HEIGHT-100))
+waypoint = Waypoint(range_=(WIDTH,HEIGHT-100))
 
 sprites = pygame.sprite.Group()
 sprites.add(drone)

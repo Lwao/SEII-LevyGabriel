@@ -7,7 +7,7 @@ class Waypoint(pygame.sprite.Sprite):
     def __init__(self, range_):
         pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
         
-        self.r = 4
+        self.r = 5
         self.range = {'x':range_[0], 'y':range_[1]}
         self.in_range = {'up':True,'down':True,'right':True,'left':True}
         self.debug_mode = True

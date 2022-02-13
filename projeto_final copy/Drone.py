@@ -9,31 +9,25 @@ ANGLE_INC = 5
 STEP = 10
 
 class Drone(pygame.sprite.Sprite):
-    def __init__(self, pd, box_, location_, range_, 
-                mass=0.25, ang_momentum=0.0002, radius=0.1, max_rot=15000, gravity=9.81,
-                force_constant=1.744e-8, time_constant=0.005):
+    def __init__(self, location_, range_):
         pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
         
         self.sprites = []
-        self.box = box_
+        self.box = (512/7,330/7)
         self.actual = 0
-        self.sprites.append(pygame.image.load('img/drone1.png'))
-        self.sprites.append(pygame.image.load('img/drone2.png'))
+
+        self.sprites.append(pygame.image.load('drone1.png'))
+        self.sprites.append(pygame.image.load('drone2.png'))
         self.sprites_num = len(self.sprites)
         self.image = self.sprites[self.actual]
         self.image = pygame.transform.scale(self.image, self.box)
         
-        self.pixel_density = pd # px/m
-        self.mass = mass # Kg
-        self.ang_momentum = ang_momentum # Kg m2
-        self.radius = radius # m
-        self.max_rot = max_rot # rpm
-        self.gravity = gravity # m/s2
-        self.force_constant = force_constant
-        self.time_constant = time_constant
+        self.mass = 0.25 # Kg
+        self.ang_momentum = 0.0002 # Kg m2
+        self.radius = 0.1 # m
+        self.max_rot = 15000 # rpm
 
-        self.speed = 0 # m/s
-        self.sprite_speed = SPEED_CAP
+        self.speed = SPEED_CAP
         self.angle = 0
 
         self.rect = self.image.get_rect()
@@ -43,15 +37,15 @@ class Drone(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = (range_[0]-self.box[0])/2, (range_[1]-self.box[1])/2
 
     def update(self):
-        if(self.sprite_speed>SPEED_CAP): self.sprite_speed = SPEED_CAP
-        self.actual += self.sprite_speed # increment sprite
+        if(self.speed>SPEED_CAP): self.speed = SPEED_CAP
+        self.actual += self.speed # increment sprite
         self.actual %= self.sprites_num # limit to the number of sprites
         self.image = self.sprites[int(self.actual)]
         self.image = pygame.transform.scale(self.image, self.box)
 
         # physics
         self.colision()
-        self.apply_gravity()
+        self.gravity()
         self.fade_speed()
         
         # rotate
@@ -68,7 +62,7 @@ class Drone(pygame.sprite.Sprite):
         inc_x = int(STEP*math.sin(abs(self.angle)*math.pi/180))
         inc_y = int(STEP*math.cos(abs(self.angle)*math.pi/180))
 
-        self.sprite_speed += POS_ACEL
+        self.speed += POS_ACEL
 
         if(self.angle>0): 
             self.rect.x -= inc_x
@@ -82,7 +76,7 @@ class Drone(pygame.sprite.Sprite):
         if self.rect.y<0: self.rect.y=0
         if (self.rect.y+self.box[1])>self.range['y']: self.rect.y=self.range['y']-self.box[1]
 
-    def apply_gravity(self):
+    def gravity(self):
         if(self.in_range['down']): self.rect.y += 2
             
     def tilt(self, inc):
@@ -91,8 +85,8 @@ class Drone(pygame.sprite.Sprite):
         if self.angle<-180: self.angle+=360
         
     def fade_speed(self):
-        self.sprite_speed -= NEG_ACEL
-        if(self.sprite_speed<0): self.sprite_speed=0
+        self.speed -= NEG_ACEL
+        if(self.speed<0): self.speed=0
 
     def track(self, waypoint):
         yf = waypoint.rect.y + waypoint.r
