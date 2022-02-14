@@ -21,7 +21,7 @@ class Waypoint(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = range_[0]/2, range_[1]/2        
         
         
-    def update(self): 
+    def update(self, h): 
         self.colision()
 
     def move(self, func_): func_()

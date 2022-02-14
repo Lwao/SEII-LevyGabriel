@@ -29,7 +29,6 @@ def mat_rot(angle):
     #return np.array([[np.cos(angle), -np.sin(angle)],[np.sin(angle), np.cos(angle)]], dtype=np.float32) # direct
     return np.array([[np.cos(angle), np.sin(angle)],[-np.sin(angle), np.cos(angle)]], dtype=np.float32).reshape(2,2) # inverse
 
-a = 0
 while True:
     dt = clock.tick(FPS)/1000
     screen.fill((0,0,0))
@@ -52,8 +51,10 @@ while True:
     # if keys[pygame.K_DOWN] or keys[pygame.K_s]: waypoint.move(waypoint.down)
     # drone.track(waypoint)
 
-    # if keys[pygame.K_LEFT] or keys[pygame.K_a]: drone.gas(5)
-    # if keys[pygame.K_RIGHT] or keys[pygame.K_d]: drone.tilt(-5)
+    if keys[pygame.K_d]: drone.gas(drone.rotor_left)
+    if keys[pygame.K_a]: drone.brake(drone.rotor_left)
+    if keys[pygame.K_l]: drone.gas(drone.rotor_right)
+    if keys[pygame.K_j]: drone.brake(drone.rotor_right)
     
     # center = np.array(drone.rect.center).reshape(-1)
     # d = np.array([0,-100]).reshape(-1)
@@ -61,7 +62,7 @@ while True:
     # pygame.draw.line(screen, 'red', center, center+d)
     # pygame.draw.line(screen, 'blue', center, center+w)
 
-    sprites.update()
+    sprites.update(dt)
     sprites.draw(screen)
     
     
