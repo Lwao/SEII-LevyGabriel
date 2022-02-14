@@ -8,7 +8,7 @@ class Waypoint(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
         
         self.r = 4
-        self.range = {'x':range_[0], 'y':range_[1]}
+        self.range = {'up':0, 'down':range_[1], 'right':range_[0], 'left':0}
         self.in_range = {'up':True,'down':True,'right':True,'left':True}
         self.debug_mode = True
 
@@ -26,24 +26,16 @@ class Waypoint(pygame.sprite.Sprite):
 
     def move(self, func_): func_()
     
-    def left(self): 
-        self.rect.x -= STEP
-        if self.rect.x<0: self.rect.x=0
-    def right(self): 
-        self.rect.x += STEP
-        if (self.rect.x+2*self.r)>self.range['x']: self.rect.x=self.range['x']-2*self.r
-    def up(self): 
-        self.rect.y -= STEP
-        if self.rect.y<0: self.rect.y=0
-    def down(self): 
-        self.rect.y += STEP
-        if (self.rect.y+2*self.r)>self.range['y']: self.rect.y=self.range['y']-2*self.r
+    def left(self): self.rect.x -= STEP
+    def right(self): self.rect.x += STEP
+    def up(self): self.rect.y -= STEP
+    def down(self): self.rect.y += STEP
 
     def colision(self):
-        self.in_range['up'] = self.rect.y>=0
-        self.in_range['left'] = self.rect.x>=0
-        self.in_range['down'] = (self.rect.y+2*self.r)<=self.range['y']
-        self.in_range['right'] = (self.rect.x+2*self.r)<=self.range['x']
+        if self.rect.left<self.range['left']: self.rect.left=self.range['left'] # left
+        if self.rect.right>self.range['right']: self.rect.right=self.range['right'] # right
+        if self.rect.top<self.range['up']: self.rect.top=self.range['up'] # up
+        if self.rect.bottom>self.range['down']: self.rect.bottom=self.range['down'] # down
 
     def debug(self, val): 
         if(val): self.debug_mode=True

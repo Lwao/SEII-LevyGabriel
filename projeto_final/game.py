@@ -1,4 +1,4 @@
-import math
+import numpy as np
 from re import M
 import pygame
 from pygame.locals import *
@@ -24,8 +24,14 @@ sprites = pygame.sprite.Group()
 sprites.add(drone)
 sprites.add(waypoint)
 
+def mat_rot(angle): 
+    angle *= np.pi/180
+    #return np.array([[np.cos(angle), -np.sin(angle)],[np.sin(angle), np.cos(angle)]], dtype=np.float32) # direct
+    return np.array([[np.cos(angle), np.sin(angle)],[-np.sin(angle), np.cos(angle)]], dtype=np.float32).reshape(2,2) # inverse
+
+a = 0
 while True:
-    clock.tick(FPS)
+    dt = clock.tick(FPS)/1000
     screen.fill((0,0,0))
     screen.blit(background.image, background.rect)
 
@@ -40,15 +46,23 @@ while True:
     # if keys[pygame.K_RIGHT] or keys[pygame.K_d]: drone.tilt(-5)
     # if keys[pygame.K_SPACE] or keys[pygame.K_w]: drone.gas()
 
-    if keys[pygame.K_LEFT] or keys[pygame.K_a]: waypoint.move(waypoint.left)
-    if keys[pygame.K_RIGHT] or keys[pygame.K_d]: waypoint.move(waypoint.right)
-    if keys[pygame.K_UP] or keys[pygame.K_w]: waypoint.move(waypoint.up)
-    if keys[pygame.K_DOWN] or keys[pygame.K_s]: waypoint.move(waypoint.down)
+    # if keys[pygame.K_LEFT] or keys[pygame.K_a]: waypoint.move(waypoint.left)
+    # if keys[pygame.K_RIGHT] or keys[pygame.K_d]: waypoint.move(waypoint.right)
+    # if keys[pygame.K_UP] or keys[pygame.K_w]: waypoint.move(waypoint.up)
+    # if keys[pygame.K_DOWN] or keys[pygame.K_s]: waypoint.move(waypoint.down)
+    # drone.track(waypoint)
 
-    drone.track(waypoint)
+    # if keys[pygame.K_LEFT] or keys[pygame.K_a]: drone.gas(5)
+    # if keys[pygame.K_RIGHT] or keys[pygame.K_d]: drone.tilt(-5)
+    
+    # center = np.array(drone.rect.center).reshape(-1)
+    # d = np.array([0,-100]).reshape(-1)
+    # w = (mat_rot(drone.angle)@d).reshape(-1)
+    # pygame.draw.line(screen, 'red', center, center+d)
+    # pygame.draw.line(screen, 'blue', center, center+w)
 
-    sprites.draw(screen)
     sprites.update()
-
+    sprites.draw(screen)
+    
     
     pygame.display.flip()
