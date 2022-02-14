@@ -48,12 +48,12 @@ while True:
     # if keys[pygame.K_DOWN] or keys[pygame.K_s]: waypoint.move(waypoint.down)
     # drone.track(waypoint)
 
-    if keys[pygame.K_d]: drone.gas(drone.rotor_left)
-    if keys[pygame.K_a]: drone.brake(drone.rotor_left)
-    if keys[pygame.K_l]: drone.gas(drone.rotor_right)
-    if keys[pygame.K_j]: drone.brake(drone.rotor_right)
+    # if keys[pygame.K_d]: drone.gas(drone.rotor_left)
+    # if keys[pygame.K_a]: drone.brake(drone.rotor_left)
+    # if keys[pygame.K_l]: drone.gas(drone.rotor_right)
+    # if keys[pygame.K_j]: drone.brake(drone.rotor_right)
 
-    speed_ = control_system.step(drone.get_actual_state(), np.array([700,300]), dt)
+    speed_ = control_system.step(drone.get_actual_state(), np.array([100,100]))
 
     drone.rotor_left.set_speed_ref(speed_[0])
     drone.rotor_right.set_speed_ref(speed_[1])

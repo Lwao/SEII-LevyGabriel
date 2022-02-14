@@ -6,16 +6,14 @@ class PID:
         self.Ki = np.float32(Ki)
         self.Kd = np.float32(Kd)
         self.integral= np.float32(0)
-        self.last_error = np.float32(0)
-        self.error = np.float32(0)
 
-    def step(self, input_error, h):
+    def step(self, proportional_error, derivative_error):
         # update errors
-        self.last_error = self.error
-        self.error = input_error
+        # self.derivative = derivative_error
+        # self.error = proportional_error
         # process output
-        proportional = self.Kp*self.error
-        self.integral = self.integral + proportional*h
-        derivative = (proportional-self.last_error)/h
+        proportional = self.Kp*proportional_error
+        self.integral += proportional_error#*h
+        derivative = derivative_error#/h
         # output control signal
         return proportional + self.Ki*self.integral + self.Kd*derivative

@@ -91,7 +91,7 @@ class Drone(pygame.sprite.Sprite):
                 'max_rotor_speed': self.max_rotor_speed,
                 'max_control_force': self.max_control_force,
                 'max_control_torque':self.max_control_torque,
-                'max_angle': 15*np.pi/180,
+                'max_angle': 90*np.pi/180,
                 'force_constant_rotor_left': self.rotor_left.force_constant,
                 'force_constant_rotor_right': self.rotor_right.force_constant}
 
@@ -144,7 +144,7 @@ class Drone(pygame.sprite.Sprite):
         # get next state
         next_state = self.rk4(h, self.get_actual_state(), self.get_input())
         if(self.count>100):
-            print(f"w = [%f, %f]\nr = [%f, %f]\nv= [%f, %f]\nphi = %f\nome = %f\n" % (next_state[0],next_state[1],next_state[2],next_state[3],next_state[4],next_state[5],next_state[6],next_state[7]))
+            print(f"w = [%f, %f]\nr = [%f, %f]\nv = [%f, %f]\nphi = %f\nome = %f\n" % (next_state[0],next_state[1],next_state[2],next_state[3],next_state[4],next_state[5],next_state[6],next_state[7]))
             self.count=0
         # distribute state variables
         self.rotor_left.set_speed(next_state[0])

@@ -9,7 +9,7 @@ class ControlSystem:
         self.TiltController = PID(Kp=.75, Kd=.05)
         self.static_dict = static_dict
         
-    def step(self, readings, reference, h):
+    def step(self, readings, reference):
         r = readings[2:4]
         v = readings[4:6]
         phi = readings[6]
@@ -17,31 +17,35 @@ class ControlSystem:
 
         # position control
         r_ = reference.reshape(2,)
+        v_ = np.zeros(2)
         error_r = r_ - r
+        error_v = v_ - v
 
         # position error is low and is not the last waypoint
         if np.linalg.norm(error_r)<.1: #and r_ID < (r_IDN): 
             print('Waypoint reached')
         
-        Fx = self.PositionControllerX.step(error_r[0], h)
-        Fy = self.PositionControllerX.step(error_r[1], h) - self.static_dict['weight_force']
+        Fx = self.PositionControllerX.step(error_r[0], error_v[0])
+        Fy = self.PositionControllerX.step(error_r[1], error_v[1]) - self.static_dict['weight_force']
         Fy = np.maximum(0.2*self.static_dict['max_control_force'], np.minimum(Fy, 0.8*self.static_dict['max_control_force']))
 
         # tilt control
         phi_ = np.arctan2(-Fx, Fy)
+        ome_ = np.float32(0)
 
-        if np.abs(phi_) > self.static_dict['max_angle']:
-            signal = phi_/np.absolute(phi_)
-            phi_ = signal * self.static_dict['max_angle']
-            Fx = Fy * np.tan(phi_) # limiting angle
+        # if np.abs(phi_) > self.static_dict['max_angle']:
+        #     signal = phi_/np.absolute(phi_)
+        #     phi_ = signal * self.static_dict['max_angle']
+        #     Fx = Fy * np.tan(phi_) # limiting angle
         
         Fxy = np.array([Fx, Fy])
         Fc = np.linalg.norm(Fxy)
         F12 = np.array([Fc/2.0, Fc/2.0])
 
-        error_phi = phi_-phi
+        error_phi = phi_ - phi
+        error_ome = ome_ - ome
         
-        Tc = self.TiltController.step(error_phi, h)
+        Tc = self.TiltController.step(error_phi, error_ome)
         Tc = np.maximum(-0.4*self.static_dict['max_control_torque'], np.minimum(Tc, 0.4*self.static_dict['max_control_torque']))
         
         # force increment
