@@ -7,6 +7,7 @@ from sys import exit
 from Background import Background
 from Drone import Drone
 from Waypoint import Waypoint
+from ControlSystem import ControlSystem
 
 from global_variables import *
 
@@ -17,17 +18,13 @@ clock = pygame.time.Clock()
 pygame.display.set_caption(TITLE)
 
 background = Background('img/background_resized.jpg', (WIDTH,HEIGHT))
-drone = Drone(pd=PIXEL_DENSITY, box_=DRONE_BOX, location_=DRONE_LOCATION, range_=BACKGROUND_INTERACTABLE_RANGE)
+drone = Drone(pd=PIXEL_DENSITY, box_=DRONE_BOX, range_=BACKGROUND_INTERACTABLE_RANGE)
 waypoint = Waypoint(range_=BACKGROUND_INTERACTABLE_RANGE)
+control_system = ControlSystem(drone.get_static_dict())
 
 sprites = pygame.sprite.Group()
 sprites.add(drone)
 sprites.add(waypoint)
-
-def mat_rot(angle): 
-    angle *= np.pi/180
-    #return np.array([[np.cos(angle), -np.sin(angle)],[np.sin(angle), np.cos(angle)]], dtype=np.float32) # direct
-    return np.array([[np.cos(angle), np.sin(angle)],[-np.sin(angle), np.cos(angle)]], dtype=np.float32).reshape(2,2) # inverse
 
 while True:
     dt = clock.tick(FPS)/1000
@@ -55,13 +52,12 @@ while True:
     if keys[pygame.K_a]: drone.brake(drone.rotor_left)
     if keys[pygame.K_l]: drone.gas(drone.rotor_right)
     if keys[pygame.K_j]: drone.brake(drone.rotor_right)
-    
-    # center = np.array(drone.rect.center).reshape(-1)
-    # d = np.array([0,-100]).reshape(-1)
-    # w = (mat_rot(drone.angle)@d).reshape(-1)
-    # pygame.draw.line(screen, 'red', center, center+d)
-    # pygame.draw.line(screen, 'blue', center, center+w)
 
+    speed_ = control_system.step(drone.get_actual_state(), np.array([700,300]), dt)
+
+    drone.rotor_left.set_speed_ref(speed_[0])
+    drone.rotor_right.set_speed_ref(speed_[1])
+    
     sprites.update(dt)
     sprites.draw(screen)
     
