@@ -1,10 +1,7 @@
 from xml.dom import xmlbuilder
 import pygame
-import math
 import numpy as np
 
-from Rotor import *
-from ControlSystem import ControlSystem
 from global_variables import *
 
 SPEED_CAP=3
@@ -34,51 +31,40 @@ class Drone(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.range = {'up':0, 'down':range_[1], 'right':range_[0], 'left':0}
         self.rect.x, self.rect.y = (range_[0]-self.box[0])/2, (range_[1]-self.box[1])/2
+        self.sprite_speed = SPEED_CAP
+        self.angle = 0
 
         self.pos2track = pixel2meter(self.rect.center)
-        
-        # objects
-        self.rotor_left = Rotor()
-        self.rotor_right = Rotor()
 
-        # static variables
-        self.mass = mass # Kg
-        self.gravity = gravity # m/s2
-        self.angular_momentum = angular_momentum # Kg m2
-        self.radius = radius # m
-        self.weight_force = -np.array([0.0, self.mass*self.gravity], dtype=np.float32) # N
-
-        self.max_rotor_speed = self.rotor_left.max_speed # rpm
-        self.max_control_force = self.rotor_left.force_constant*self.max_rotor_speed**2 # N
-        self.max_control_torque = self.radius*self.max_control_force # Nm
-
-        # kinematic and dynamic variables
-        self.position = pixel2meter(np.array(self.rect.center, dtype=np.float32)) # m
-        self.linear_speed = np.array([0.0, 0.0], dtype=np.float32) # m/s 
-        self.angle = np.float32(0.0) # rad
-        self.rotational_speed = np.float32(0.0) #rpm
-        self.control_force = np.array([0.0, self.rotor_left.force+self.rotor_right.force], dtype=np.float32) # N
-        self.control_torque = np.float32(self.radius*(self.rotor_left.force-self.rotor_right.force)) # N
-        self.rotor_speed = np.array([self.rotor_left.speed, self.rotor_right.speed], dtype=np.float32)
-        self.sprite_speed = SPEED_CAP
-
-        self.ControlSystem = ControlSystem(self.get_static_dict())
+        self.x = np.array([ 0., 0., \
+                            0., 0., \
+                            0., .0, \
+                            0*np.pi/180., \
+                            0*np.pi/180.])
+        self.w_ = np.zeros(2).reshape(2,)
 
         self.count=0
 
     def track(self, pos): self.pos2track = pixel2meter(pos)
 
     def update(self, h):
-        # physics
         h_acc = 0
         for _ in range(round(h/self.h_sys)): 
             h_acc += self.h_sys
-            if (h_acc % self.h_ctrl) == 0: 
-                speed_ = self.ControlSystem.step(self.get_actual_state(), self.pos2track)
-                self.rotor_left.set_speed_ref(speed_[0])
-                self.rotor_right.set_speed_ref(speed_[1])
-            self.process(self.h_sys)
-            self.colision()
+            if (h_acc % self.h_ctrl) == 0: self.w_ = self.control_step(self.x, self.pos2track)
+            self.x = self.rk4(self.h_sys, self.x, self.w_) # simulação um passo a frente
+
+        self.count+=1
+        if self.count>=100:
+            print(f"r_ = (%f, %f)" % (self.pos2track[0], self.pos2track[1]))
+            print(f"w = [%f, %f]\nr = [%f, %f]\nv = [%f, %f]\nphi = %f\nome = %f\n" % tuple(self.x))
+            print()
+            self.count=0
+        
+
+        self.rect.x, self.rect.y = meter2pixel(self.x[2:4]).reshape(2,) - np.array([self.rect.width/2,self.rect.height/2]).reshape(2,)
+        
+        self.colision()
 
         # shift sprite accordingly
         if(self.sprite_speed>SPEED_CAP): self.sprite_speed = SPEED_CAP
@@ -91,94 +77,166 @@ class Drone(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.image, self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
-    def get_static_dict(self):
-        # return dictionary with some static info to the control system
-        return {'weight_force': self.weight_force[1],
-                'max_rotor_speed': self.max_rotor_speed,
-                'max_control_force': self.max_control_force,
-                'max_control_torque':self.max_control_torque,
-                'max_angle': 15*np.pi/180,
-                'force_constant_rotor_left': self.rotor_left.force_constant,
-                'force_constant_rotor_right': self.rotor_right.force_constant}
-
-    def get_actual_state(self):
-        # return actual state
-        return np.concatenate([ self.rotor_speed, 
-                                self.position, 
-                                self.linear_speed, 
-                                np.array([self.angle]), 
-                                np.array([self.rotational_speed]) ])
-    
-    def get_input(self): 
-        # return input vector based in rotors speed reference value
-        return np.array([   self.rotor_left.speed_ref, 
-                            self.rotor_right.speed_ref], dtype=np.float32)
-
-    def get_state_vector_derivative(self, actual_state, input_):
-        # rename inputs and actual state
-        w_ = input_
-        w = actual_state[0:2]
-        r = actual_state[2:4]
-        v = actual_state[4:6]
-        phi = actual_state[6]
-        ome = actual_state[7]
-
-        D_RB = np.array([ [ np.cos(phi), -np.sin(phi)], \
-                          [ np.sin(phi), np.cos(phi)]])
-
-        # compute state vector derivative
-        w_dot = (w_ - w)/self.rotor_left.time_constant
-        r_dot = v
-        #v_dot = ((rotation_matrix(phi)@self.control_force + self.weight_force)/self.mass).reshape(2,)
-        v_dot = ((D_RB@self.control_force + self.weight_force)/self.mass).reshape(2,)
-        phi_dot = np.array([ome])
-        ome_dot = np.array([self.control_torque/self.angular_momentum])
-        
-        return np.concatenate([ w_dot, 
-                                r_dot, 
-                                v_dot, 
-                                phi_dot, 
-                                ome_dot])
-
-    def rk4(self, h, actual_state, input_):
-        # compute 4th order Runge-Kutta
-        k1 = self.get_state_vector_derivative(actual_state, input_)
-        k2 = self.get_state_vector_derivative(actual_state + h*k1/2.0, input_)
-        k3 = self.get_state_vector_derivative(actual_state + h*k2/2.0, input_)
-        k4 = self.get_state_vector_derivative(actual_state + h*k3, input_)
-        next_state = actual_state + (h/6.0)*(k1 + 2*k2 + 2*k3 + k4)
-        return next_state
-    
-    def refresh_state_vector(self):
-        # update drone and rotor variables to map actual state
-        self.rotor_left.update() # compute force
-        self.rotor_right.update() # compute force
-        self.control_force = np.array([0.0, self.rotor_left.force+self.rotor_right.force], dtype=np.float32)
-        self.control_torque = np.float32(self.radius*(self.rotor_left.force-self.rotor_right.force))
-        self.rotor_speed = np.array([self.rotor_left.speed, self.rotor_right.speed], dtype=np.float32)
-        self.position = pixel2meter(np.array(self.rect.center, dtype=np.float32))
-        
-    def update_state_vector(self, next_state):
-        # distribute state variables
-        self.rotor_left.set_speed(next_state[0])
-        self.rotor_right.set_speed(next_state[1])
-        self.rect.x, self.rect.y = meter2pixel(next_state[2:4]) - np.array([self.rect.width/2,self.rect.height/2])
-        self.linear_speed = next_state[4:6]
-        self.angle = next_state[6]
-        self.rotational_speed = next_state[7]
-
-    def process(self, h):
-        self.refresh_state_vector() # update dynamic variables of objects
-        next_state = self.rk4(h, self.get_actual_state(), self.get_input()) # get next state
-        self.update_state_vector(next_state) # distribute next state to actual state
-
-        self.count+=1
-        if(self.count>300):
-            print(f"w = [%f, %f]\nr = [%f, %f]\nv = [%f, %f]\nphi = %f\nome = %f\n" % (next_state[0],next_state[1],next_state[2],next_state[3],next_state[4],next_state[5],next_state[6],next_state[7]))
-            self.count=0      
-
     def colision(self):
         if self.rect.left<self.range['left']: self.rect.left=self.range['left'] # left
         if self.rect.right>self.range['right']: self.rect.right=self.range['right'] # right
         if self.rect.top<self.range['up']: self.rect.top=self.range['up'] # up
         if self.rect.bottom>self.range['down']: self.rect.bottom=self.range['down'] # down
+
+    def get_sys_const(self):
+        m = 0.25 # massa
+        g = 9.81 # aceleração da gravidade
+        l = 0.1 # tamanho
+        kf = 1.744e-08 # constante de força
+        Iz = 2e-4 # momento de inércia
+        tal = 0.05 # constante de tempo rotor
+        Fg = -m*g # força da gravidade
+
+        # Restrições do controle
+        phi_max = 15*np.pi/180. # ângulo máximo
+        w_max = 15000
+        Fc_max = kf*w_max**2 # Força de controle máximo
+        Tc_max = l*kf*w_max**2
+
+        return m, g, l, kf, Iz, tal, Fg, phi_max, w_max, Fc_max, Tc_max
+
+    def x_dot(self, x, w_):
+        # State vector
+        # x = [ w r_xy v_xy phi omega]' \in R^8
+        
+        ## Parâmetros
+        m, _, l, kf, Iz, tal, Fg, _, _, _, _ = self.get_sys_const()
+        Fg = np.array([[0],\
+                        [Fg]])
+
+        ## Estados atuais
+        w = x[0:2]
+        r = x[2:4]
+        v = x[4:6]
+        phi = x[6]
+        ome = x[7]
+        
+        ## Variáveis auxiliares
+
+        # forças
+        f1 = kf * w[0]**2
+        f2 = kf * w[1]**2
+
+        # Torque
+        Tc = l * (f1 - f2)
+
+        # Força de controle
+        Fc_B = np.array( [[0], \
+                        [(f1 + f2)]])
+        
+        # Matriz de atitude
+        D_RB = np.array([ [ np.cos(phi), -np.sin(phi)], \
+                        [ np.sin(phi), np.cos(phi)]])
+
+        ## Derivadas
+        w_dot = (-w + w_)/tal
+        r_dot = v
+        v_dot = (1/m)*(D_RB @ Fc_B + Fg)
+        v_dot = v_dot.reshape(2,)
+        phi_dot = np.array([ome])
+        ome_dot = np.array([Tc/Iz])
+        
+        xkp1 = np.concatenate([ w_dot, \
+                                r_dot, \
+                                v_dot, \
+                                phi_dot,\
+                                ome_dot ])
+        return xkp1
+    
+    def rk4(self, h, xk, uk):
+        k1 = self.x_dot(xk, uk)
+        k2 = self.x_dot(xk + h*k1/2.0, uk)
+        k3 = self.x_dot(xk + h*k2/2.0, uk)
+        k4 = self.x_dot(xk + h*k3, uk)
+        xkp1 = xk +(h/6.0)*(k1 + 2*k2 + 2*k3 + k4)
+        return xkp1
+
+    def control_step(self, x, r_):
+        ### Execução da simulação
+
+        _, _, _, kf, _, _, Fg, phi_max, w_max, Fc_max, Tc_max = self.get_sys_const()
+        Fg = np.array([Fg])
+        
+        # Sistema de controle
+
+        # Extrai os dados do vetor
+        r = x[2:4]
+        v = x[4:6]
+        phi = x[6]
+        ome = x[7]
+
+        # Comando de posição
+        v_ = np.array([0,0])
+        
+        #####################
+        # Controle de Posição
+        kpP = np.array([.075])
+        kdP = np.array([0.25])
+        eP = r_ - r
+        eV = v_ - v
+        
+        # Definição do próximo waypoint
+        if np.linalg.norm(eP) < .1:
+            pass#print('Waypoint encontrado!')
+
+        Fx = kpP * eP[0] + kdP * eV[0]
+        Fy = kpP * eP[1] + kdP * eV[1] - Fg
+        Fy = np.maximum(0.2*Fc_max, np.minimum(Fy, 0.8*Fc_max))
+
+        #####################
+        # Controle de Atitude
+        
+        phi_ = np.arctan2(-Fx, Fy)
+        
+        if np.abs(phi_) > phi_max:
+            #print(phi_*180/np.pi)
+            signal = phi_/np.absolute(phi_)
+            phi_ = signal * phi_max
+
+            # Limitando o ângulo
+            Fx = Fy * np.tan(phi_)
+        
+        Fxy = np.array([Fx, Fy])
+        Fc = np.linalg.norm(Fxy)
+        f12 = np.array([Fc/2.0, Fc/2.0])
+        
+        # Constantes Kp e Kd
+        kpA = np.array([.75])
+        kdA = np.array([0.05])
+        ePhi = phi_ - phi
+        eOme = 0 - ome
+        
+        Tc = kpA * ePhi + kdA * eOme
+        Tc = np.maximum(-0.4*Tc_max, np.minimum(Tc, 0.4*Tc_max))
+        
+        # Delta de forças
+        df12 = np.absolute(Tc)/2.0
+
+        # Forças f1 e f2 final f12' = f12 + deltf12
+        if (Tc >= 0.0):
+            f12[0] = f12[0] + df12
+            f12[1] = f12[1] - df12
+        else:
+            f12[0] = f12[0] - df12
+            f12[1] = f12[1] + df12
+
+        # Comando de rpm dos motores
+        w1_ = np.sqrt(f12[0]/(kf))
+        w2_ = np.sqrt(f12[1]/(kf))
+
+        # Limitando o comando do motor entre 0 - 15000 rpm
+        w1 = np.maximum(0., np.minimum(w1_, w_max))
+        w2 = np.maximum(0., np.minimum(w2_, w_max))
+
+        # Determinação do comando de entrada
+        w_ = np.array([w1, w2])
+
+        return w_
+
+        
+        
