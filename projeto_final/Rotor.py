@@ -10,6 +10,6 @@ class Rotor:
         self.force = np.float32(self.force_constant*self.speed**2) # N
         self.mass = np.float32(mass) # Kg
 
-    def update(self): self.force = -np.float32(self.force_constant*self.speed**2)
+    def update(self): self.force = np.float32(self.force_constant*self.speed**2)
     def set_speed_ref(self, speed): self.speed_ref = np.maximum(np.float32(0), np.minimum(speed, self.max_speed))
     def set_speed(self, speed): self.speed = np.maximum(np.float32(0), np.minimum(speed, self.max_speed))

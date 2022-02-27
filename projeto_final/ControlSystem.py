@@ -8,6 +8,8 @@ class ControlSystem:
         self.PositionControllerY = PID(Kp=.075, Kd=.25)
         self.TiltController = PID(Kp=.75, Kd=.05)
         self.static_dict = static_dict
+
+        self.count=0
         
     def step(self, readings, reference):
         r = readings[2:4]
@@ -17,26 +19,31 @@ class ControlSystem:
 
         # position control
         r_ = reference.reshape(2,)
-        v_ = np.zeros(2)
+        v_ = np.zeros(2).reshape(2,)
         error_r = r_ - r
         error_v = v_ - v
+        
+        # self.count+=1
+        # if self.count>10:
+        #     print(f"r = [%f,%f]\nr_ = [%f,%f]\nr_e = [%f,%f]\n" % (r[0],r[1],r_[0],r_[1],error_r[0],error_r[1]))
+        #     self.count=0
 
         # position error is low and is not the last waypoint
         if np.linalg.norm(error_r)<.1: #and r_ID < (r_IDN): 
             print('Waypoint reached')
         
         Fx = self.PositionControllerX.step(error_r[0], error_v[0])
-        Fy = self.PositionControllerX.step(error_r[1], error_v[1]) - self.static_dict['weight_force']
+        Fy = self.PositionControllerY.step(error_r[1], error_v[1]) - self.static_dict['weight_force']
         Fy = np.maximum(0.2*self.static_dict['max_control_force'], np.minimum(Fy, 0.8*self.static_dict['max_control_force']))
 
         # tilt control
         phi_ = np.arctan2(-Fx, Fy)
         ome_ = np.float32(0)
 
-        # if np.abs(phi_) > self.static_dict['max_angle']:
-        #     signal = phi_/np.absolute(phi_)
-        #     phi_ = signal * self.static_dict['max_angle']
-        #     Fx = Fy * np.tan(phi_) # limiting angle
+        if np.abs(phi_) > self.static_dict['max_angle']:
+            signal = phi_/np.absolute(phi_)
+            phi_ = signal * self.static_dict['max_angle']
+            Fx = Fy * np.tan(phi_) # limiting angle
         
         Fxy = np.array([Fx, Fy])
         Fc = np.linalg.norm(Fxy)
