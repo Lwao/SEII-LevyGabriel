@@ -42,8 +42,8 @@ class Button():
 
         return colision, action
 
-    def block(self):
-        
+    def block(self): pass
+
 
     def set_image(self, image, x, y):
         self.image = pygame.transform.smoothscale(      image, 

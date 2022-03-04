@@ -1,7 +1,7 @@
 import numpy as np
 
 WIDTH, HEIGHT = (800,489)
-TITLE = 'DDAir - Drone Dynamics in the Air'
+TITLE = 'Drone Simulation'
 
 BACKGROUND_INTERACTABLE_RANGE = (WIDTH,HEIGHT-100)
 

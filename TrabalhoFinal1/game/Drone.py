@@ -54,12 +54,12 @@ class Drone(pygame.sprite.Sprite):
             if (h_acc % self.h_ctrl) == 0: self.w_ = self.control_step(self.x, self.pos2track)
             self.x = self.rk4(self.h_sys, self.x, self.w_) # simulação um passo a frente
 
-        self.count+=1
-        if self.count>=100:
-            print(f"r_ = (%f, %f)" % (self.pos2track[0], self.pos2track[1]))
-            print(f"w = [%f, %f]\nr = [%f, %f]\nv = [%f, %f]\nphi = %f\nome = %f\n" % tuple(self.x))
-            print()
-            self.count=0
+        # self.count+=1
+        # if self.count>=100:
+        #     print(f"r_ = (%f, %f)" % (self.pos2track[0], self.pos2track[1]))
+        #     print(f"w = [%f, %f]\nr = [%f, %f]\nv = [%f, %f]\nphi = %f\nome = %f\n" % tuple(self.x))
+        #     print()
+        #     self.count=0
         
 
         self.rect.x, self.rect.y = meter2pixel(self.x[2:4]).reshape(2,) - np.array([self.rect.width/2,self.rect.height/2]).reshape(2,)
@@ -71,7 +71,7 @@ class Drone(pygame.sprite.Sprite):
         self.actual += self.sprite_speed # increment sprite
         self.actual %= self.sprites_num # limit to the number of sprites
         self.image = self.sprites[int(self.actual)]
-        self.image = pygame.transform.scale(self.image, self.box)
+        self.image = pygame.transform.smoothscale(self.image, self.box)
 
         # rotate sprite accordingly
         self.image = pygame.transform.rotate(self.image, self.angle)
