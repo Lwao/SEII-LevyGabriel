@@ -17,7 +17,9 @@ pygame.init()
 
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 clock = pygame.time.Clock()
+pygame.font.init()
 pygame.display.set_caption(TITLE)
+pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
 background = Background('img/background_resized.jpg', (WIDTH,HEIGHT))
 light_background = Background('img/light_background_resized.jpg', (WIDTH,HEIGHT))
@@ -42,16 +44,16 @@ while True:
             exit()
         elif (event.type == KEYDOWN) and (event.key == K_ESCAPE): pause = not pause
 
-
     if not pause: # not pause
         screen.blit(background.image, background.rect)
 
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]: waypoint.move(waypoint.left)
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]: waypoint.move(waypoint.right)
-        if keys[pygame.K_UP] or keys[pygame.K_w]: waypoint.move(waypoint.up)
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]: waypoint.move(waypoint.down)
+        if gui.actions['mode'] == 0: # joystick mode
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]: waypoint.move(waypoint.left)
+            if keys[pygame.K_RIGHT] or keys[pygame.K_d]: waypoint.move(waypoint.right)
+            if keys[pygame.K_UP] or keys[pygame.K_w]: waypoint.move(waypoint.up)
+            if keys[pygame.K_DOWN] or keys[pygame.K_s]: waypoint.move(waypoint.down)
     
         # drone.track([100,100])
         drone.track(waypoint.rect.center)
