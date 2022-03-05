@@ -2,7 +2,28 @@ from xml.dom import xmlbuilder
 import pygame
 import numpy as np
 
-from global_variables import *
+"""
+- canvas: (0 to 800px, 0 to 389px)
+- real: (-2.5 to 2.5m, -1.25 to 1.25m)
+
+ Xp - 0      Xm - (-2.5)
+--------  = ------------
+800 - 0      2.5 - (-2.5)
+
+ Yp - 389       Ym - (-1.25)
+----------  = ----------------
+ 0 - 389        1.25 - (-1.25)
+
+ Xm = Xp * 5/800 - 2.5
+ Ym = (Yp-389) * 2.5/(-389) - 1.25
+
+ Xp = (Xm+2.5)*800/5
+ Yp = (Ym+1.25)*(-389)/2.5 + 389
+
+"""
+
+pixel2meter = lambda px : np.array([px[0]*5/800-2.5, (px[1]-389)*2.5/(-389)-1.25]) 
+meter2pixel = lambda m: np.array([(m[0]+2.5)*800/5, (m[1]+1.25)*(-389)/2.5 + 389])
 
 SPEED_CAP=3
 

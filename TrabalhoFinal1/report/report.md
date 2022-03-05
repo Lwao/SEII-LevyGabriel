@@ -37,4 +37,38 @@ Para auxiliar o desenvolvimento da aplicação em `Python`, alguns módulos ou b
 
 # Integração do sistema
 
+## Árvore de diretórios
+
+Abaixo observa-se a árvore de diretórios que compõe o projeto do drone. Nela pode-se observar a divisão do aplicativo nos diretórios `/data`, `/gui_utils`, `/img` e `/sprites`, além do pasta raiz `/game`.
+
+```
+📦game
+ ┣ 📂data
+ ┃ ┣ 📜.gitignore
+ ┃ ┗ 📜data.csv
+ ┣ 📂gui_utils
+ ┃ ┣ 📜Button.py
+ ┃ ┗ 📜GUI.py
+ ┣ 📂img
+ ┃ ┣ 📜images...
+ ┣ 📂sprites
+ ┃ ┣ 📜Background.py
+ ┃ ┣ 📜Drone.py
+ ┃ ┗ 📜Waypoint.py
+ ┣ 📜game.py
+ ┗ 📜requirements.txt
+```
+
+De acordo com os diretórios, cada um guarda uma função específica:
+
+- `/game` é o diretório raiz da aplicação e este contém todos os outros diretórios, o *script* principal de execução da simulação do drone e um arquivo de `requirements.txt` indicando as versões das bibliotecas em Python utilizadas para esta aplicação;
+- `/sprites` contém as classes para as principais *sprites* utilizadas na simulação, estas são: `Background` para definir as telas de fundo do jogo e da interface com o usuário; `Waypoint` para definir a movimentação, colisão e visualização dos pontos de destino utilizados na simulação; e `Drone` contendo detalhes da cinemática e dinâmica do drone de acordo com as leis físicas e o sistema de controle interno de posição;
+- `/img` contém todas as imagens utilizadas na aplicação, estas envolvendo plano de fundo, *sprites* e botões;
+- `/gui_utils` contém as classes utilizadas para montar a interface gráfica interativa com o usuário, estas são: `Button` para gerar os botões e seu gerenciamento; e `GUI` que encompassa a totalidade dos botões utilizados na interface e demais gerenciamento da interface;
+- `/data` é um diretório destinado a armazenar os arquivos `.csv` exportados pela aplicação e que contém dados relacionados às variáveis de estado do drone.
+
+## Drone
+
+## Interface gráfica com o usuário
+
 # Referências sobre conceitos extras

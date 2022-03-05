@@ -11,13 +11,24 @@ import matplotlib.pyplot as plt
 import matplotlib.backends.backend_agg as agg
 matplotlib.use("Agg")
 
-from Background import Background
-from Drone import Drone
-from Waypoint import Waypoint
+from sprites.Background import Background
+from sprites.Drone import Drone
+from sprites.Waypoint import Waypoint
 
 from gui_utils.GUI import GUI
 
-from global_variables import *
+WIDTH, HEIGHT = (800,489)
+TITLE = 'Drone Simulation'
+
+BACKGROUND_INTERACTABLE_RANGE = (WIDTH,HEIGHT-100)
+
+DRONE_RADIUS = 0.1 # m
+DRONE_IMG_DIM = (512,330)
+DRONE_IMG_SCALER = 6.4
+DRONE_BOX = (DRONE_IMG_DIM[0]/DRONE_IMG_SCALER,DRONE_IMG_DIM[1]/DRONE_IMG_SCALER)
+
+SIZE_WIN = 32
+FPS = 50
 
 def draw_waypoint_pool(screen_, pool_, r_=4, color_=(0,0,255)):
     for pos_ in pool_:
@@ -95,6 +106,7 @@ while True:
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]: waypoint.move(waypoint.right)
             if keys[pygame.K_UP] or keys[pygame.K_w]: waypoint.move(waypoint.up)
             if keys[pygame.K_DOWN] or keys[pygame.K_s]: waypoint.move(waypoint.down)
+        
         if gui.actions['mode'] == 1: # waypoint mode
             if pygame.mouse.get_pressed()[0]:
                 clicked = True
@@ -108,31 +120,28 @@ while True:
                 if len(waypoint_deque)!=0: # while there are position to be reached the waypoint is set to it
                     waypoint.set_position(waypoint_deque.popleft())                        
 
-        if gui.actions['debug']:
+        if gui.actions['debug']: # debug mode
             draw_waypoint_pool(screen, waypoint_deque)
             waypoint.debug(True)
         else:
             waypoint.debug(False)
 
-        if gui.actions['plot']: 
+        if gui.actions['plot']: # plot mode
             plot_buffer.append(drone.rect.center)
             if len(plot_buffer) == SIZE_WIN:
                 raw_data, size = plot_variables(plot_buffer)
                 plot_buffer = []
-            screen.blit(pygame.image.frombuffer(raw_data, size, "RGBA"), (0,489-100))
+            screen.blit(pygame.image.frombuffer(raw_data, size, "RGBA"), (0,489-105))
 
-        if gui.actions['csv']:
+        if gui.actions['csv']: # export csv mode
             csv_buffer.append(drone.x)
             if len(csv_buffer) == 8*SIZE_WIN:
                 np.savetxt('data/data.csv', np.array(csv_buffer), delimiter=',')
                 csv_buffer = []
 
-
-        if gui.actions['analytics']:
+        if gui.actions['analytics']: # show analytics
             gui.get_system_utils(dt, screen)
 
-
-            
         drone.track(waypoint.rect.center)
     
         sprites.update(dt)
