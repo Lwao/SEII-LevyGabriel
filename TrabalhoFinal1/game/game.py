@@ -79,9 +79,11 @@ while True:
     dt = clock.tick(FPS)/1000
     screen.fill((0,0,0))
     
-    # gui.draw(screen)
     for event in pygame.event.get():
-        if (event.type == KEYDOWN) and (event.key == K_ESCAPE): pause = not pause
+        if event.type == QUIT:
+            pygame.quit()
+            exit()
+        elif (event.type == KEYDOWN) and (event.key == K_ESCAPE): pause = not pause
 
     if not pause: # not pause
         screen.blit(background.image, background.rect)
@@ -125,8 +127,10 @@ while True:
                 np.savetxt('data/data.csv', np.array(csv_buffer), delimiter=',')
                 csv_buffer = []
 
+
         if gui.actions['analytics']:
             gui.get_system_utils(dt, screen)
+
 
             
         drone.track(waypoint.rect.center)

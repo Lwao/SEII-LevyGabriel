@@ -27,8 +27,8 @@ Para auxiliar o gerenciamento da simulação, a aplicação deve conter uma inte
 
 - Selecionar o modo em que a simulação irá operar, seja movimentando o drone por meio de setas no teclado ou por meio de pontos de destino estabelecidos por coordenadas cartesianas da tela ou pelo clique do mouse;
 - Possuir botões para ativar o modo de depuração que permite observar os pontos de destino com clareza e destinção da ordem com que o drone irá perserguir, no caso do modo com pontos de destino e o mesmo conjunto de botões pode permitir observar o ponto de destino modificável pelas setas, no caso do modo de movimentação por setas no teclado;
-- Ativar ou desativar painel com informações de depuração, e.g. taxa atual de frames, porcentagem de consumo da CPU, GPU, RAM pelo aplicativo, modelo da CPU e/ou GPU utilizada, *clock* da memória RAM, temperatura da CPU, etc;
-- Permitir plots em tempo real da evolução das variáveis de estado ou exportação em um arquivo textual, e.g. `.csv` ou `.txt`.
+- Ativar ou desativar painel com informações de depuração, e.g. taxa atual de frames, porcentagem de consumo da CPU, porcentagem de consumo da memória RAM;
+- Permitir plots em tempo real da evolução das variáveis de estado e/ou exportação em um arquivo textual, e.g. `.csv` ou `.txt`.
 
 
 # Módulos utilizados na aplicação
