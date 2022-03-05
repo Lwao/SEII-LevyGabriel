@@ -43,15 +43,17 @@ class Drone(pygame.sprite.Sprite):
                             0*np.pi/180.])
         self.w_ = np.zeros(2).reshape(2,)
 
+        self.reach_destination = False
         self.count=0
 
-    def track(self, pos): self.pos2track = pixel2meter(pos)
+    def track(self, pos): 
+        self.pos2track = pixel2meter(pos)
 
     def update(self, h):
         h_acc = 0
         for _ in range(round(h/self.h_sys)): 
             h_acc += self.h_sys
-            if (h_acc % self.h_ctrl) == 0: self.w_ = self.control_step(self.x, self.pos2track)
+            if (h_acc % self.h_ctrl) == 0: self.w_, self.reach_destination = self.control_step(self.x, self.pos2track)
             self.x = self.rk4(self.h_sys, self.x, self.w_) # simulação um passo a frente
 
         # self.count+=1
@@ -157,6 +159,7 @@ class Drone(pygame.sprite.Sprite):
         return xkp1
 
     def control_step(self, x, r_):
+        reach_destination = False
         ### Execução da simulação
 
         _, _, _, kf, _, _, Fg, phi_max, w_max, Fc_max, Tc_max = self.get_sys_const()
@@ -182,7 +185,7 @@ class Drone(pygame.sprite.Sprite):
         
         # Definição do próximo waypoint
         if np.linalg.norm(eP) < .1:
-            pass#print('Waypoint encontrado!')
+            reach_destination = True
 
         Fx = kpP * eP[0] + kdP * eV[0]
         Fy = kpP * eP[1] + kdP * eV[1] - Fg
@@ -236,7 +239,7 @@ class Drone(pygame.sprite.Sprite):
         # Determinação do comando de entrada
         w_ = np.array([w1, w2])
 
-        return w_
+        return w_, reach_destination
 
         
         

@@ -24,6 +24,10 @@ class GUI():
         self.actions = self.init_actions()
         self.init_labels()
 
+        # toggle on at init
+        self.buttons['debug'].toggle = True
+        self.actions['debug'] = True
+
     def init_actions(self):
         keys = list(self.buttons.keys())
         values = [False,False,False,False,False,False]
