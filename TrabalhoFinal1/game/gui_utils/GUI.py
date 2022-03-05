@@ -1,5 +1,7 @@
 import pygame
 from gui_utils.Button import Button
+import psutil
+import math
 
 class GUI():
     def __init__(self):
@@ -100,3 +102,26 @@ class GUI():
         if final_colision: pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else: pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
+    def get_system_utils(self, dt, screen):
+        cpu_percent = round(psutil.cpu_percent(),1) # %
+        cpu_freq = round(psutil.cpu_freq().current) # MHz
+        fps = round(1/dt) # FPS
+        mem_available = round(psutil.virtual_memory().available / (1024*1024))
+        mem_percent = round(psutil.virtual_memory().percent,1)
+        
+        text = ["CPU %.1f%% %.0f MHz" % (cpu_percent, cpu_freq), 
+                "RAM %.1f%% Avl:%.0f MB" % (mem_percent, mem_available), 
+                "FPS %.0f" % fps]
+
+        
+        fontsize = 10
+        font = pygame.font.SysFont('calibri', fontsize)
+        label = []
+        text = ['Game mode running in joystick mode.', 'Use the keyboard arrows keys or WASD to move.']
+        for line in text: label.append(font.render(line, True, (0, 0, 0)))
+        for line in range(len(label)):
+            text = label[line]
+            text_rect = (600, 10+(line*fontsize)+(15*line))
+            screen.blit(text, text_rect)
+
+        

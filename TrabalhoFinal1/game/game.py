@@ -81,10 +81,7 @@ while True:
     
     # gui.draw(screen)
     for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-            exit()
-        elif (event.type == KEYDOWN) and (event.key == K_ESCAPE): pause = not pause
+        if (event.type == KEYDOWN) and (event.key == K_ESCAPE): pause = not pause
 
     if not pause: # not pause
         screen.blit(background.image, background.rect)
@@ -128,6 +125,10 @@ while True:
                 np.savetxt('data/data.csv', np.array(csv_buffer), delimiter=',')
                 csv_buffer = []
 
+        if gui.actions['analytics']:
+            gui.get_system_utils(dt, screen)
+
+            
         drone.track(waypoint.rect.center)
     
         sprites.update(dt)
@@ -135,6 +136,10 @@ while True:
     else: # pause
         screen.blit(light_background.image, light_background.rect)
         gui.draw(screen)
+
+        if gui.actions['power']:
+            pygame.quit()
+            exit()
 
     
     pygame.display.flip()
