@@ -42,21 +42,21 @@ Para auxiliar o desenvolvimento da aplicação em `Python`, alguns módulos ou b
 Abaixo observa-se a árvore de diretórios que compõe o projeto do drone. Nela pode-se observar a divisão do aplicativo nos diretórios `/data`, `/gui_utils`, `/img` e `/sprites`, além do pasta raiz `/game`.
 
 ```
-📦game
- ┣ 📂data
- ┃ ┣ 📜.gitignore
- ┃ ┗ 📜data.csv
- ┣ 📂gui_utils
- ┃ ┣ 📜Button.py
- ┃ ┗ 📜GUI.py
- ┣ 📂img
- ┃ ┣ 📜images...
- ┣ 📂sprites
- ┃ ┣ 📜Background.py
- ┃ ┣ 📜Drone.py
- ┃ ┗ 📜Waypoint.py
- ┣ 📜game.py
- ┗ 📜requirements.txt
+game
+ |-- data
+ | |- .gitignore
+ | |- data.csv
+ |-- gui_utils
+ | |- Button.py
+ | |- GUI.py
+ |-- img
+ | |- images...
+ |-- sprites
+ | |- Background.py
+ | |- Drone.py
+ | |- Waypoint.py
+ |-- game.py
+ |-- requirements.txt
 ```
 
 De acordo com os diretórios, cada um guarda uma função específica:
