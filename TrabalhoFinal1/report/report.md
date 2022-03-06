@@ -71,4 +71,7 @@ De acordo com os diretórios, cada um guarda uma função específica:
 
 ## Interface gráfica com o usuário
 
+A interface gráfica é dividida em duas classes apenas, a classe Button, que cria um objeto de botão, colocando as cores passadas, posicionamento, mudanças que podem acontecer no momento do clique, entre outras funções. Já a classe GUI tem uma função mais geral, utilizando a classe Button para criar seus vários botões e posicioná-los, com alguns labels para cada botão, sendo eles `mode`, `plot`, `analytics`, `csv`, `debug` e `power`. O botão `mode` serve par alterar o modo de jogo entre `joystick` e `waypoint`, o botão `plot` expõe as variáveis de estado do sistema do drone, enquanto o botão `csv` exporta-os para um arquivo `.csv`. O botão debug destaca o waypoint para se ter conhecimento em para onde o drone estará indo e o botão `analytics` plota na tela a performance do jogo na máquina. Por último, o botão `power` desliga a aplicação.
+Dentro do jogo, depois que o objeto GUI é criado, sempre é verificado se algum label do botão foi alterado para atualizar as funções no jogo.
+
 # Referências sobre conceitos extras
