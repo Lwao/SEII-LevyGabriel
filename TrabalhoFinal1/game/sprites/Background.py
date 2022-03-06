@@ -7,3 +7,4 @@ class Background(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, box)
         self.rect = self.image.get_rect()
         self.rect.left, self.rect.top = (0,0)
+        

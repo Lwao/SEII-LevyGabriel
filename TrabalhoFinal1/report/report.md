@@ -69,9 +69,9 @@ De acordo com os diretórios, cada um guarda uma função específica:
 
 ## Drone
 
-No desenvolvimento do drone, inicilamente foram levadas em conta as mecânicas básicas inierentes a uma *sprite*, como: gerenciamento de colisões; acervo de imagens para a *sprite* escolher sendo, basicamente duas, que auxiliam na ilusão do giro dos rotores do drone; escalação da imagem das *sprites* para o tamanho adequado.
+No desenvolvimento do drone, inicilamente foram levadas em conta as mecânicas básicas inerentes a uma *sprite*, como: gerenciamento de colisões; acervo de imagens para a *sprite*, constituído basicamente de duas, que auxiliam na ilusão do giro dos rotores do drone; escalação da imagem das *sprites* para o tamanho adequado.
 
-Inicialmente o drone possuirá métodos para sua movimentação com as setas do teclado ou WASD e com simples mecânica de gravidade e inércia para uma noção básica de como este se comportaria. Posteriormente, estas mecânicas foram substituídas pelas equações dinâmicas do movimento do drone que leva em conta parâmetros físicos pré-determinados.
+Inicialmente o drone possuiu métodos para sua movimentação com as setas do teclado ou WASD e com simples mecânica de gravidade e inércia para uma noção básica de como este se comportaria. Posteriormente, estas mecânicas foram substituídas pelas equações dinâmicas do movimento do drone que leva em conta parâmetros físicos pré-determinados.
 
 Para isto, o código do drone foi alterado para que sua movimentação dependece da solução dessas equações da dinâmica, portanto implementando por meio da solução de um sistema de equações diferença no espaço de estados o sistema que representa o drone, recebendo comandos de velocidade para ambos os rotores e desenvolvendo uma velocidade linear bidimensional, velocidade dos rotores, ângulo de ataque, velocidade angular e, principalmente, uma determinada posição bidimensional variante no tempo, como variáveis de estado.
 

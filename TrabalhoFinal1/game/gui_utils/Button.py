@@ -12,8 +12,6 @@ class Button():
 
         self.set_image(self.image_off, self.x, self.y)
     
-        
-    
     def draw(self, screen):
         action = False
         colision = False
