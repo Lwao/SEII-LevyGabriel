@@ -106,7 +106,6 @@ No caso da movimentação por pontos definidos pelo mouse, o mesmo `Waypoint` an
 
 ## Interface gráfica com o usuário
 
-<<<<<<< HEAD
 A interface gráfica com as opções oferecidas pode ser acessada unicamente quando o usuário pausar o jogo por meio da tecla *escape*. Essa separação entre a interface e o jogo evita problemas de queda de frames durante a execução do jogo, mas a depender de uma boa otimização do código, torna-se apenas uma questão cosmética.
 
 Ao acessar a tela de configuração da interface gráfica a figura 2 pode ser observada. A interface é bem minimalista e possui apenas 6 botões para implementar as funcionalidades descritas na seção de especificações. 
@@ -118,7 +117,7 @@ Figura 2 - Interface gráfica com o usuário minimalista.
 ![gui](gui.png)
 </center>
 
-Ainda cada botão da interface oferecerá uma descrição da sua funcionalidade ao passar o *mouse* por cima, permitindo total compreensão.
+A interface gráfica é dividida em duas classes apenas, a classe Button, que cria um objeto de botão, colocando as cores passadas, posicionamento, mudanças que podem acontecer no momento do clique, entre outras funções. Já a classe GUI tem uma função mais geral, utilizando a classe Button para criar seus vários botões e posicioná-los, com alguns labels para cada botão, sendo eles `mode`, `plot`, `analytics`, `csv`, `debug` e `power`. Dentro do jogo, depois que o objeto GUI é criado, sempre é verificado se algum label do botão foi alterado para atualizar as funções no jogo. Ainda cada botão da interface oferecerá uma descrição da sua funcionalidade ao passar o *mouse* por cima, permitindo total compreensão.
 
 Obedecendo a sequência da esquerda para a direita, cada botão tem a seguinte funcionalidade:
 
@@ -147,9 +146,3 @@ O desenvolvimento do projeto do drone permitiu compreender a aplicação em temp
 A aplicação em forma de jogo permitiu o acesso simples e caseiro a um drone, permitindo o discente se interar sobre a física por trás desse tipo de veículo.
 
 Por fim, apesar do projeto ser simples, este possui grande representatividade em futuros projetos profissionais, pois como este se configura como uma simulação, a aplicação real não divergirá significativamente, pelo menos falando em relação ao projeto do sistema de controle e dos algoritmos a serem usados no *firmware* de um possível drone.
-=======
-A interface gráfica é dividida em duas classes apenas, a classe Button, que cria um objeto de botão, colocando as cores passadas, posicionamento, mudanças que podem acontecer no momento do clique, entre outras funções. Já a classe GUI tem uma função mais geral, utilizando a classe Button para criar seus vários botões e posicioná-los, com alguns labels para cada botão, sendo eles `mode`, `plot`, `analytics`, `csv`, `debug` e `power`. O botão `mode` serve par alterar o modo de jogo entre `joystick` e `waypoint`, o botão `plot` expõe as variáveis de estado do sistema do drone, enquanto o botão `csv` exporta-os para um arquivo `.csv`. O botão debug destaca o waypoint para se ter conhecimento em para onde o drone estará indo e o botão `analytics` plota na tela a performance do jogo na máquina. Por último, o botão `power` desliga a aplicação.
-Dentro do jogo, depois que o objeto GUI é criado, sempre é verificado se algum label do botão foi alterado para atualizar as funções no jogo.
-
-# Referências sobre conceitos extras
->>>>>>> 430037700efc9f30e9e691ff7a6c3f620a97f3a1
