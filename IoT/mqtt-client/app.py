@@ -1,3 +1,5 @@
+# python -m pipreqs.pipreqs
+
 import paho.mqtt.client as mqtt
 import time
 
