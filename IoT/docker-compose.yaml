@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mosquitto-broker:
+    container_name: mosquitto-broker-app
+    build: ./mqtt-broker
+    restart: unless-stopped
+    ports: 
+      - "1883:1883"
+    networks:
+      - mqtt-internal-network
+
+  paho-client:
+    container_name: paho-client-app
+    build: ./mqtt-client
+    restart: unless-stopped
+    networks:
+      - mqtt-internal-network
+    environment:
+      - PYTHONUNBUFFERED=1
+
+networks:
+  mqtt-internal-network:
+    driver: bridge
