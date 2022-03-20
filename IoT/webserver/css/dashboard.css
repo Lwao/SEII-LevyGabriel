@@ -102,3 +102,42 @@ body {
   border-color: transparent;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
+
+.form-check-input:active {
+  background-color: rgb(255,121,1) !important;
+  border-color: rgb(255,121,1) !important;
+}
+
+.form-check-input:checked {
+  background-color: rgb(255,121,1) !important;
+  border-color: rgb(255,121,1) !important;
+  outline-color: 0 none !important;
+}
+
+
+.form-check-input[type=checkbox]:indeterminate {
+  background-color: rgb(255,121,1) !important;
+  border-color: rgb(255,121,1) !important;
+  outline-color: 0 none !important;
+}
+
+.form-check-input[type=checkbox]:indeterminate {
+  background-color: rgb(255,121,1) !important;
+  border-color: rgb(255,121,1) !important;
+  outline-color: 0 none !important;
+}
+
+.form-check-input:focus {
+  border-color: rgb(255,121,1) !important;
+  outline-color: 0 none !important;
+}
+
+
+*:hover,
+*:focus,
+*:active
+ {
+  outline: none;
+  box-shadow: none !important;
+  -webkit-appearance: none;
+}

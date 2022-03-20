@@ -38,14 +38,14 @@ body {
   border-top-right-radius: 0;
 }
 
-.btn-primary, .btn-primary:active {
-  background-color: rgb(255,121,1) !important;
-  border-color: rgb(255,121,1) !important;
-}
-
 .btn-primary, .btn-primary:hover {
   background-color: rgb(251,47,0) !important;
   border-color: rgb(251,47,0) !important;
+}
+
+.btn-primary, .btn-primary:active {
+  background-color: rgb(255,121,1) !important;
+  border-color: rgb(255,121,1) !important;
 }
 
 

@@ -1,5 +1,21 @@
 /* globals Chart:false, feather:false */
 
+function changeButtonStatus() {
+  document.getElementById('dashboard-button').classList.remove('active');
+  document.getElementById('control-button').classList.remove('active');
+  document.getElementById('devices-button').classList.remove('active');
+  document.getElementById('reports-button').classList.remove('active');
+  document.getElementById('info-button').classList.remove('active');
+
+  document.getElementById(this.id).classList.add('active');
+}
+
+document.getElementById('dashboard-button').onclick = changeButtonStatus;
+document.getElementById('control-button').onclick = changeButtonStatus;
+document.getElementById('devices-button').onclick = changeButtonStatus;
+document.getElementById('reports-button').onclick = changeButtonStatus;
+document.getElementById('info-button').onclick = changeButtonStatus;
+
 (function () {
   'use strict'
 
@@ -32,9 +48,12 @@
         ],
         lineTension: 0,
         backgroundColor: 'transparent',
-        borderColor: '#007bff',
+        borderColor: 'rgb(255,121,1)',
         borderWidth: 4,
-        pointBackgroundColor: '#007bff'
+        pointBackgroundColor: 'rgb(255,121,1)',
+        pointBorderColor: 'rgb(255,121,1)',
+        pointHoverBackgroundColor: 'rgb(251,47,0)',
+        pointHoverBorderColor: 'rgb(251,47,0)',
       }]
     },
     options: {
