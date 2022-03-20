@@ -39,31 +39,8 @@
     #include "esp_system.h" // esp system functions
 #endif //ESP_MANAGEMENT_LIBS_INCLUDED
 
-#ifndef WIFI_LIBS_INCLUDED
-    #define WIFI_LIBS_INCLUDED
-    #include "esp_wifi.h"
-    #include "esp_event.h"
-    #include "nvs_flash.h"
-    #include "esp_netif.h"
-#endif //WIFI_LIBS_INCLUDED
-
-#ifndef MQTT_LIBS_INCLUDED
-    #define MQTT_LIBS_INCLUDED
-    #include "mqtt_client.h"
-#endif //MQTT_LIBS_INCLUDED
-
-
-#define ESP_WIFI_SSID      "2018"
-#define ESP_WIFI_PASS      "la06le19lu43al4606194346"
-#define ESP_MAXIMUM_RETRY  10
-#define WIFI_CONNECTED_BIT BIT0
-#define WIFI_FAIL_BIT      BIT1
-
-#define MQTT_SERVER "192.168.18.45"
-#define MQTT_PORT 1883
-#define MQTT_USER ""
-#define MQTT_PWD ""
-
+#include "wifi.h"
+#include "mqtt.h"
 
 #define GPIO_INPUT_PIN_SEL   (1ULL<<GPIO_NUM_0)  // | (1ULL<<ANOTHER_GPIO)
 #define ESP_INTR_FLAG_DEFAULT 0
@@ -71,11 +48,7 @@
 #define BUFFER_LEN 64
 #define BIT_(shift) (1<<shift)
 
-// Log tags
-
 #define SETUP_APP_TAG "app_main"
-#define WIFI_TAG "wifi_config"
-#define MQTT_TAG "mqtt_config"
 
 // Events
 enum events{SYSTEM_STARTED,
@@ -103,8 +76,6 @@ portMUX_TYPE spinlock = portMUX_INITIALIZER_UNLOCKED;
 float buffer1[BUFFER_LEN];
 float buffer2[BUFFER_LEN];
 
-static int s_retry_num = 0;
-static EventGroupHandle_t s_wifi_event_group;
 
 /**
  * @brief Task placeholder.
@@ -117,43 +88,5 @@ void vTask(void * pvParameters);
  * @brief Interrupt service routine for button pressed (associated with BOOT button a.k.a GPIO0).
  */
 static void IRAM_ATTR ISR_BTN();
-
-/**
- * @brief Initialize Wi-Fi configuration.
- */
-void wifi_station_init();
-
-/**
- * @brief Initialize MQTT configuration.
- */
-static void mqtt_client_init();
-
-/**
- * @brief Handles Wi-Fi related events
- * 
- * @param arg user data registered to the event.
- * @param event_base Event base for the handler
- * @param event_id The id for the received event.
- * @param event_data The data for the event, esp_mqtt_event_handle_t.
- */
-static void wifi_event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data);
-
-/**
- * @brief Event handler registered to receive MQTT events
- *
- * @param handler_args user data registered to the event.
- * @param base Event base for the handler(always MQTT Base in this example).
- * @param event_id The id for the received event.
- * @param event_data The data for the event, esp_mqtt_event_handle_t.
- */
-static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
-
-/**
- * @brief Log message in response to MQTT error
- *
- * @param message Incoming message.
- * @param error_code Error code to handle.
- */
-static void log_error_if_nonzero(const char *message, int error_code);
 
 #endif // _MAIN_H_
