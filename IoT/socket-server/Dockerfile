@@ -7,4 +7,5 @@ RUN apt-get update -y && \
     apt-get install -y python3-pip python-dev
 WORKDIR /app
 COPY . .
-CMD ["python", "./app.py"]
+#CMD ["python", "./app.py"]
+CMD ["tail", "-f", "/dev/null"]

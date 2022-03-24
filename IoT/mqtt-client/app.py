@@ -1,8 +1,6 @@
 # python -m pipreqs.pipreqs
 
-from http import client
 import multiprocessing
-from pydoc import cli
 import sys
 import time
 

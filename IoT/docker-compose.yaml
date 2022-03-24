@@ -14,6 +14,8 @@ services:
     container_name: paho-client-app
     build: ./mqtt-client
     restart: unless-stopped
+    volumes:
+      - "C:\\Users\\levyg\\Documents\\MEGA\\Repositories\\SEII-LevyGabriel\\IoT\\mqtt-client:/app"
     networks:
       - mqtt-internal-network
       - socket-internal-network
@@ -24,6 +26,8 @@ services:
     container_name: socket-server-app
     build: ./socket-server
     restart: unless-stopped
+    volumes:
+      - "C:\\Users\\levyg\\Documents\\MEGA\\Repositories\\SEII-LevyGabriel\\IoT\\socket-server:/app"
     networks:
       - socket-internal-network
     environment:
