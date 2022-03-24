@@ -8,8 +8,10 @@ from mqtt_client import *
 from socket_client import *
 
 if __name__ == "__main__":
-    mqtt_process = multiprocessing.Process(target=start_mqtt_client) # thread to handle mqtt client
-    socket_process = multiprocessing.Process(target=start_client_socket) # thread to communicate with webserver
+    mqttConn, socketConn = multiprocessing.Pipe()
+
+    mqtt_process = multiprocessing.Process(target=start_mqtt_client, args=(mqttConn,)) # thread to handle mqtt client
+    socket_process = multiprocessing.Process(target=start_client_socket, args=(socketConn,)) # thread to communicate with webserver
     
     mqtt_process.start()
     time.sleep(.2)

@@ -6,9 +6,23 @@ import time
 
 from socket_server import *
 
+def flask_app(conn):
+    while True:
+        conn.send('Message from Flask')
+        time.sleep(1)
+        if conn.poll(timeout=.1): 
+            msg = conn.recv()
+            if msg: print('Flask app -> ' + msg)
+
+
 if __name__ == "__main__":
-    server_process = multiprocessing.Process(target=start_server_socket) 
+    flaskConn, socketConn = multiprocessing.Pipe()
+
+    server_process = multiprocessing.Process(target=start_server_socket, args=(socketConn,)) 
+    flask_process = multiprocessing.Process(target=flask_app, args=(flaskConn,)) 
+
     server_process.start()
+    flask_process.start()
 
     try:
         while True:
@@ -16,5 +30,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print('Exiting...')
         server_process.terminate()
+        flask_process.terminate()
         print('Processes successfully closed')
         sys.exit()

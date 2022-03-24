@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+import time
 
 # data to fetch in the database
 """
@@ -59,7 +60,7 @@ def on_subscribe(client, obj, mid, granted_qos):
 def on_log(client, obj, level, string):
     print(string)
 
-def start_mqtt_client():
+def start_mqtt_client(conn):
     # connection credentials
     brokerAddress = "mosquitto-broker-app" # broker address
     port = 1883 # TCP/IP port
@@ -80,7 +81,12 @@ def start_mqtt_client():
     # Continue the network loop, exit when an error occurs
     rc = 0
     while rc == 0:
+        if conn.poll(timeout=.1): 
+            msg = conn.recv()
+            if msg: print('MQTT client -> ' + msg)
         rc = client.loop()
+        conn.send('Message from MQTT')
+        time.sleep(1)
     print("rc: " + str(rc))
 
 if __name__ == "__main__":
