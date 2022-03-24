@@ -16,9 +16,21 @@ services:
     restart: unless-stopped
     networks:
       - mqtt-internal-network
+      - socket-internal-network
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  socket-server:
+    container_name: socket-server-app
+    build: ./socket-server
+    restart: unless-stopped
+    networks:
+      - socket-internal-network
     environment:
       - PYTHONUNBUFFERED=1
 
 networks:
   mqtt-internal-network:
+    driver: bridge
+  socket-internal-network:
     driver: bridge

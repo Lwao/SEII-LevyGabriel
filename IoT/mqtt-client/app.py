@@ -1,66 +1,29 @@
 # python -m pipreqs.pipreqs
 
-import paho.mqtt.client as mqtt
+from http import client
+import multiprocessing
+from pydoc import cli
+import sys
 import time
 
-# The callback for when the client receives a CONNACK response from the server.
-def on_connect(client, userdata, flags, rc):
-    if rc == 0:
-        # print("Connected successfully")
-        global connected
-        connected=True
-    else:
-        # None
-        print("Connect returned result code: " + str(rc))
+from mqtt_client import *
+from socket_client import *
 
-# The callback for when a PUBLISH message is received from the server.
-def on_message(client, obj, msg):
-    print("Received message: " + msg.topic + " -> " + msg.payload.decode("utf-8"))
-    # print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
+if __name__ == "__main__":
+    mqtt_process = multiprocessing.Process(target=start_mqtt_client) # thread to handle mqtt client
+    socket_process = multiprocessing.Process(target=start_client_socket) # thread to communicate with webserver
+    
+    mqtt_process.start()
+    time.sleep(.2)
+    socket_process.start()
+    time.sleep(.2)
 
-def on_publish(client, obj, mid):
-    print("mid: " + str(mid))
-
-def on_subscribe(client, obj, mid, granted_qos):
-    print("Subscribed: " + str(mid) + " " + str(granted_qos))
-
-def on_log(client, obj, level, string):
-    print(string)
-
-connected = False # connection status
-msgReceived = False # message status
-
-brokerAddress = "mosquitto-broker-app" # broker address
-port = 1883 # TCP/IP port
-userName = "" # server username
-passWord = "" # server password
-
-# mqtt client configuration
-client = mqtt.Client("Dashboard") # create the mqtt client
-client.on_connect = on_connect # set on connect callback
-client.on_message = on_message # set on message callback
-client.on_publish = on_publish
-client.on_subscribe = on_subscribe
-#client.on_log = on_log # uncomment to enable debug messages
-client.username_pw_set(userName, passWord) # set username and password
-client.connect(brokerAddress, port) # connect to mosquitto broker on port 1883
-client.tls_set(tls_version=mqtt.ssl.PROTOCOL_TLS) # enable TLS
-
-client.subscribe("topic", 0) # subscribe to desired topics with QoS level 0
-client.publish("topic", "Hello Mosquitto!") # Publish a message
-
-# Continue the network loop, exit when an error occurs
-rc = 0
-while rc == 0:
-    rc = client.loop()
-print("rc: " + str(rc))
-
-# client.loop_start()
-
-# while connected!=True:
-#     time.sleep(0.2)
-# while msgReceived!=True:
-#     time.sleep(0.2)
-
-
-# client.loop_stop()
+    try:
+        while True:
+            time.sleep(.1)
+    except KeyboardInterrupt:
+        print('Exiting...')
+        mqtt_process.terminate()
+        socket_process.terminate()
+        print('Processes successfully closed')
+        sys.exit()
