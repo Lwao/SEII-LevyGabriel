@@ -3,13 +3,14 @@ import threading
 import select
 
 SERVER_IP = socket.gethostbyname(socket.gethostname()) # define server ip based in host 
-PORT = 50500 # port to connections
+PORT = 5050 # port to connections
 ADDR = (SERVER_IP, PORT) # address tuple with server ip and port
 FORMAT = 'utf-8' # format of messages
 MSG_MAX_LEN = 1024 # message max. length
 TIMEOUT_S = 1
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # instantiate server socket with socket TCP
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server.bind(ADDR) # bound server to address of choice
 
 def handle_incoming_msg(conn, conn_client):

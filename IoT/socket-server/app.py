@@ -8,9 +8,9 @@ from socket_server import *
 
 def flask_app(conn):
     while True:
-        conn.send('Message from Flask')
-        time.sleep(1)
-        if conn.poll(timeout=.1): 
+        # send message
+        #conn.send('Message from Flask')
+        if conn.poll(timeout=.1): # receive message
             msg = conn.recv()
             if msg: print('Flask app -> ' + msg)
 

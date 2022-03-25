@@ -1,12 +1,6 @@
 import paho.mqtt.client as mqtt
 import time
 
-# data to fetch in the database
-"""
-Must load the current available users and fetch their data in the db
-"""
-USERS = ['red','blue','green']
-
 connected = False # connection status
 msgReceived = False # message status
 
@@ -17,8 +11,10 @@ def on_connect(client, userdata, flags, rc):
         global connected
         connected=True
 
-        # subscribe to all users main topics
-        for username in USERS: 
+        ###### get USER list from db
+        USERS = ['red','blue','green']
+        
+        for username in USERS: # subscribe to all users main topics
             client.subscribe(f"%s/#" % username, 2) # subscribe to desired topics with QoS level 2
             client.publish(f"%s/status" % username, "offline") # try to publish offline status to all housenodes
     else:
@@ -31,25 +27,22 @@ def on_message(client, obj, msg):
 
     payload = msg.payload.decode("utf-8") # decode payload
     topic = msg.topic.split("/") # split message topic
-    
     tlen = len(topic) # topic length
+
+    obj['pipe'].send(msg.topic) # beacons that the given topic was updated
+
     if tlen>=1: username = topic[0] # user is the first input
     if tlen==2: # status command
         if topic[1]=='status':
-            """
-            Upload availability status to db
-            """
+            ###### upload availability status to db
             if payload=='online': # if online sends all ports values for given user
-                """
-                Fetch all port data from the db
-                """
+                ###### fetch all port data from the db for current user
                 for port in range(1,16): client.publish(f"%s/devices/port%d" % (username,port), "online") # initialize ports to user based in db data
     if tlen==3: # devices command
         if topic[1]=='devices': 
+            ###### must forward the port's online/offline status to the db 
             port = topic[2] # store port
-            """
-            Must forward the port's online/offline status to the db and inform the webserver
-            """
+            
 
 def on_publish(client, obj, mid):
     print("mid: " + str(mid))
@@ -60,6 +53,21 @@ def on_subscribe(client, obj, mid, granted_qos):
 def on_log(client, obj, level, string):
     print(string)
 
+def handle_command(cmd):
+    header, body = cmd.split(':')
+
+    if header=='topic': # topic updated
+        ###### fetch db for topic data
+        ###### publish data from db to housenode
+        pass
+    if header=='user': # new user
+        if body=='update':
+            ###### fetch db for all user
+            ###### fetch db for all user port data
+            ###### publish all user port data to housenode
+            pass
+
+
 def start_mqtt_client(conn):
     # connection credentials
     brokerAddress = "mosquitto-broker-app" # broker address
@@ -68,7 +76,8 @@ def start_mqtt_client(conn):
     passWord = "" # server password
 
     # mqtt client configuration
-    client = mqtt.Client("Dashboard") # create the mqtt client
+    userdata_dict = {'pipe': conn}
+    client = mqtt.Client(userdata=userdata_dict) # create the mqtt client
     client.on_connect = on_connect # set on connect callback
     client.on_message = on_message # set on message callback
     client.on_publish = on_publish
@@ -81,12 +90,15 @@ def start_mqtt_client(conn):
     # Continue the network loop, exit when an error occurs
     rc = 0
     while rc == 0:
+        # handle incoming messages from Flask webserver
         if conn.poll(timeout=.1): 
             msg = conn.recv()
-            if msg: print('MQTT client -> ' + msg)
+            if msg: 
+                print('MQTT client -> ' + msg)
+                handle_command(msg)
+        # proceeds with mqtt loop
         rc = client.loop()
-        conn.send('Message from MQTT')
-        time.sleep(1)
+        time.sleep(.01)
     print("rc: " + str(rc))
 
 if __name__ == "__main__":
