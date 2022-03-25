@@ -1,62 +1,38 @@
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask 
+from flask import Blueprint, render_template, url_for, request, redirect, flash
+from . import db
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-db = SQLAlchemy(app)
+auth = Blueprint('auth', __name__)
 
-class Todo(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String(200), nullable=False)
-    completed = db.Column(db.Integer, default=0)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+class User(UserMixin, db.Model):
 
-    def __repr__(self) :
-        return '<Task %r>' % self.id
+    _id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100))
+    password = db.Column(db.String(20))
 
-@app.route('/', methods=['POST', 'GET'])
+    def __init__(self, _mail, _pass):
+        self.mail = _mail
+        self.password = _pass
+
+
+@auth.route('/', methods=['POST', 'GET'])
 def index():
-    if request.method == 'POST':
-        task_content = request.form['content']
-        new_task = Todo(content=task_content)
+    email = request.form.get('user')
+    password = request.form.get('password')
 
-        try:
-            db.session.add(new_task)
-            db.session.commit()
-            return redirect('/')
-        except:
-            return 'There was an issue adding your task'
-    else:
-        tasks = Todo.query.order_by(Todo.date_created).all()
-        return render_template('index.html', tasks=tasks)
+    user = User.query.filter_by(email=email).first()
 
-
-@app.route('/delete/<int:id>')
-def delete(id):
-    task_to_delete = Todo.query.get_or_404(id)
-
-    try:
-        db.session.delete(task_to_delete)
-        db.session.commit()
+    if not user:
+        flash('Please check your login details and try again')
         return redirect('/')
-    except:
-        return 'There was a problem deleting this task'
 
-@app.route('/update/<int:id>', methods=['GET', 'POST'])
-def update(id):
-    task = Todo.query.get_or_404(id)
-    if request.method == 'POST':
-        task.content = request.form['content']
 
-        try:
-            db.session.commit()
-            return redirect('/')
-        except:
-            return 'There was an issue updateing your task'
-    else: 
-        return render_template('update.html', task=task)
-    return ''
+    return redirect(url_for('auth.dashboard'))
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@auth.route('/dashboard')
+def dashboard():
+
+    return render_template("dashboard.html")        
+
