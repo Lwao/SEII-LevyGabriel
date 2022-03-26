@@ -47,8 +47,8 @@ services:
       - ./db/schema.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - db-internal-network
-    environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=True
+    env_file:
+      - ./db/db.env
 
   python-mysql:
     container_name: python-mysql-app
