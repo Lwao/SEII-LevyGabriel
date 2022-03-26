@@ -4,7 +4,7 @@ services:
   mosquitto-broker:
     container_name: mosquitto-broker-app
     build: ./mqtt-broker
-    restart: unless-stopped
+    restart: always
     ports: 
       - "1883:1883"
     networks:
@@ -13,9 +13,13 @@ services:
   paho-client:
     container_name: paho-client-app
     build: ./mqtt-client
-    restart: unless-stopped
-    volumes:
-      - "C:\\Users\\levyg\\Documents\\MEGA\\Repositories\\SEII-LevyGabriel\\IoT\\mqtt-client:/app"
+    restart: always
+    depends_on:
+      - mosquitto-broker
+      - socket-server
+      - db
+    #volumes: # dev option
+    #  - "C:\\Users\\levyg\\Documents\\MEGA\\Repositories\\SEII-LevyGabriel\\IoT\\mqtt-client:/app"
     networks:
       - mqtt-internal-network
       - socket-internal-network
@@ -25,11 +29,38 @@ services:
   socket-server:
     container_name: socket-server-app
     build: ./socket-server
-    restart: unless-stopped
-    volumes:
-      - "C:\\Users\\levyg\\Documents\\MEGA\\Repositories\\SEII-LevyGabriel\\IoT\\socket-server:/app"
+    restart: always
+    # volumes: # dev option
+    #   - "C:\\Users\\levyg\\Documents\\MEGA\\Repositories\\SEII-LevyGabriel\\IoT\\socket-server:/app"
     networks:
       - socket-internal-network
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  db:
+    container_name: db-app
+    build: ./db
+    restart: always
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - db-internal-network
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=True
+
+  python-mysql:
+    container_name: python-mysql-app
+    build: ./python-mysql
+    restart: always
+    depends_on:
+      - mosquitto-broker
+      - db
+    volumes: # dev option
+      - "C:\\Users\\levyg\\Documents\\MEGA\\Repositories\\SEII-LevyGabriel\\IoT\\python-mysql:/app"
+    networks:
+      - db-internal-network
     environment:
       - PYTHONUNBUFFERED=1
 
@@ -37,4 +68,6 @@ networks:
   mqtt-internal-network:
     driver: bridge
   socket-internal-network:
+    driver: bridge
+  db-internal-network:
     driver: bridge
