@@ -70,12 +70,10 @@ def handle_mqtt_message(client, userdata, message):
             elif port=='port3': port3_status = data['payload']
             elif port=='port4': port4_status = data['payload']
             elif port=='port5': port5_status = data['payload']
-                            
-    
 
 @app.route('/', methods=['POST', 'GET'])
 def control_route():
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', ports=[port1_status,port2_status,port3_status,port4_status,port5_status])
 
 @app.route('/handle_devices', methods=['POST'])
 def handle_devices():
@@ -91,7 +89,8 @@ def handle_devices():
     if port4=='on' or port4=='off': mqtt.publish(f"trabalho_final_2_iot/%s/devices/port4" % ('blue'), port4, 2)
     if port5=='on' or port5=='off': mqtt.publish(f"trabalho_final_2_iot/%s/devices/port5" % ('blue'), port5, 2)
 
-    return '', 204
+    # return '', 204
+    return redirect('/')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
