@@ -15,7 +15,7 @@ app.config['MQTT_PASSWORD'] = ''
 app.config['MQTT_KEEPALIVE'] = 5
 app.config['MQTT_TLS_ENABLED'] = False
 app.config['MQTT_CLEAN_SESSION'] = True
-app.config['MQTT_CLIENT_ID'] = 'main-client'
+app.config['MQTT_CLIENT_ID'] = 'iot-client-seII'
 app.config['MQTT_LAST_WILL_TOPIC'] = 'server'
 app.config['MQTT_LAST_WILL_MESSAGE'] = 'offline'
 app.config['MQTT_LAST_WILL_QOS'] = 0
@@ -80,7 +80,6 @@ def handle_mqtt_message(client, userdata, message):
 
 @app.route('/', methods=['POST', 'GET'])
 def control_route():
-    
     return render_template('dashboard.html')
 
 if __name__ == "__main__":
