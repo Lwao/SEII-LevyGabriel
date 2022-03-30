@@ -36,14 +36,13 @@
     #include "esp_system.h" // esp system functions
 #endif //ESP_MANAGEMENT_LIBS_INCLUDED
 
-#define MQTT_SERVER "192.168.18.45"
+#define MQTT_SERVER "broker.hivemq.com"
 #define MQTT_PORT 1883
 #define MQTT_USER ""
 #define MQTT_PWD ""
 
 
 #define USERNAME "blue"
-
 #define MQTT_TAG "mqtt_config"
 
 /**

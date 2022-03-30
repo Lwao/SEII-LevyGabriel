@@ -3,7 +3,7 @@ version: '3.8'
 services:
   mosquitto-broker:
     container_name: mosquitto-broker-app
-    build: ./mqtt-broker
+    build: ./broker
     restart: always
     ports: 
       - "1883:1883"

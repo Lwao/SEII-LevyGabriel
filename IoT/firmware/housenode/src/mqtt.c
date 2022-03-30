@@ -19,9 +19,9 @@ void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event
     switch ((esp_mqtt_event_id_t)event_id) {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(MQTT_TAG, "MQTT_EVENT_CONNECTED");
-        msg_id = esp_mqtt_client_subscribe(client, USERNAME "/#", 2);
+        msg_id = esp_mqtt_client_subscribe(client, "trabalho_final_2_iot/" USERNAME "/#", 2);
         ESP_LOGI(MQTT_TAG, "sent subscribe successful, msg_id=%d", msg_id);
-        msg_id = esp_mqtt_client_publish(client, USERNAME "/status", "online", 0, 2, 0);
+        msg_id = esp_mqtt_client_publish(client, "trabalho_final_2_iot/" USERNAME "/status", "online", 0, 2, 0);
         ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d", msg_id);
 
         // initialize pins to zero
@@ -29,14 +29,14 @@ void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event
         for(int port=0; port<15; port++)
         {
             gpio_set_level(port_map[port], 0);
-            asprintf(&topic_back, USERNAME "/devices/port%d", port+1);
+            asprintf(&topic_back, "trabalho_final_2_iot/" USERNAME "/devices/port%d", port+1);
             msg_id = esp_mqtt_client_publish(client, topic_back, "offline", 0, 2, 0);
             ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d", msg_id);
         }
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(MQTT_TAG, "MQTT_EVENT_DISCONNECTED");
-        msg_id = esp_mqtt_client_publish(client, USERNAME "/status", "offline", 0, 2, 0);
+        msg_id = esp_mqtt_client_publish(client, "trabalho_final_2_iot/" USERNAME "/status", "offline", 0, 2, 0);
         ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d", msg_id);
         break;
     case MQTT_EVENT_SUBSCRIBED:
@@ -77,6 +77,7 @@ void topic_handler(esp_mqtt_event_handle_t event, esp_mqtt_client_handle_t clien
     asprintf(&data, "%.*s", event->data_len, event->data);
     
     token = strtok(topic, "/");
+    token = strtok(NULL, "/");
     if((token != NULL) && (strcmp(token,USERNAME)==0)
     ) // extracts USERNAME
     {
@@ -87,7 +88,7 @@ void topic_handler(esp_mqtt_event_handle_t event, esp_mqtt_client_handle_t clien
             {
                 if(strcmp(data,"online")!=0) // if not online status force to it
                 {
-                    msg_id = esp_mqtt_client_publish(client, USERNAME "/status", "online", 0, 2, 0);
+                    msg_id = esp_mqtt_client_publish(client, "trabalho_final_2_iot/" USERNAME "/status", "online", 0, 2, 0);
                     ESP_LOGI(MQTT_TAG, "sent publish successful, msg_id=%d", msg_id);
                 }                
             } else if(strcmp(token,"devices")==0) // get port
@@ -96,7 +97,7 @@ void topic_handler(esp_mqtt_event_handle_t event, esp_mqtt_client_handle_t clien
                 port = strtol(token, NULL, 10); // convert port number to int
 
                 char* topic_back;
-                asprintf(&topic_back, USERNAME "/devices/port%d", port);
+                asprintf(&topic_back, "trabalho_final_2_iot/" USERNAME "/devices/port%d", port);
 
                 if(strcmp(data,"on")==0) // receive the on command
                 {

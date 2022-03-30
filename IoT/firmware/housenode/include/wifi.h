@@ -26,8 +26,8 @@
 
 #include "freertos/event_groups.h"
 
-#define ESP_WIFI_SSID      "2018"
-#define ESP_WIFI_PASS      "la06le19lu43al4606194346"
+#define ESP_WIFI_SSID      "Oriole"
+#define ESP_WIFI_PASS      "boapergunta"
 #define ESP_MAXIMUM_RETRY  10
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
