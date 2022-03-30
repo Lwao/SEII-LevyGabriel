@@ -1,12 +1,15 @@
 from flask import Flask, render_template, url_for, request, redirect
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_mqtt import Mqtt
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+port1_status = 'offline'
+port2_status = 'offline'
+port3_status = 'offline'
+port4_status = 'offline'
+port5_status = 'offline'
+
 
 app.config['MQTT_BROKER_URL'] = 'broker.hivemq.com'
 app.config['MQTT_BROKER_PORT'] = 1883
@@ -21,26 +24,11 @@ app.config['MQTT_LAST_WILL_MESSAGE'] = 'offline'
 app.config['MQTT_LAST_WILL_QOS'] = 0
 
 mqtt = Mqtt(app)
-db = SQLAlchemy(app)
-
-# class Devices(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(30))
-#     state = db.Column(db.String(10))
-
-#     def __init__(self, id, name, state):
-#         self.id = id
-#         self.name = name
-#         self.state = state
-
-# device = Devices.query.filter_by(id=1).first()
-
 
 @mqtt.on_connect()
 def handle_mqtt_connect(client, userdata, flags, rc):
     if rc == 0:
-        ###### get USER list from db
-        USERS = ['red','blue','green']
+        USERS = ['blue']
         
         for username in USERS: # subscribe to all users main topics
             mqtt.subscribe(f"trabalho_final_2_iot/%s/#" % username, 2) # subscribe to desired topics with QoS level 2
@@ -59,9 +47,10 @@ def handle_mqtt_message(client, userdata, message):
         payload=message.payload.decode("utf-8")
     )
 
+    global port1_status, port2_status, port3_status, port4_status, port5_status
+
     print("Received message: " + data['topic'] + " -> " + data['payload'])
 
-    
     topic = data['topic'].split("/") # split message topic
     tlen = len(topic) # topic length
 
@@ -71,16 +60,38 @@ def handle_mqtt_message(client, userdata, message):
             ###### upload availability status to db
             if data['payload']=='online': # if online sends all ports values for given user
                 ###### fetch all port data from the db for current user
-                for port in range(1,16): mqtt.publish(f"trabalho_final_2_iot/%s/devices/port%d" % (username,port), "online", 2) # initialize ports to user based in db data
+                for port in range(1,16): mqtt.publish(f"trabalho_final_2_iot/%s/devices/port%d" % (username,port), "off", 2) # initialize ports to user based in db data
     if tlen==4: # devices command
         if topic[2]=='devices': 
             ###### must forward the port's online/offline status to the db 
             port = topic[3] # store port
+            if port=='port1': port1_status = data['payload']
+            elif port=='port2': port2_status = data['payload']
+            elif port=='port3': port3_status = data['payload']
+            elif port=='port4': port4_status = data['payload']
+            elif port=='port5': port5_status = data['payload']
+                            
     
 
 @app.route('/', methods=['POST', 'GET'])
 def control_route():
     return render_template('dashboard.html')
+
+@app.route('/handle_devices', methods=['POST'])
+def handle_devices():
+    port1 = request.form["port1"]
+    port2 = request.form["port2"]
+    port3 = request.form["port3"]
+    port4 = request.form["port4"]
+    port5 = request.form["port5"]
+
+    if port1=='on' or port1=='off': mqtt.publish(f"trabalho_final_2_iot/%s/devices/port1" % ('blue'), port1, 2)
+    if port2=='on' or port2=='off': mqtt.publish(f"trabalho_final_2_iot/%s/devices/port2" % ('blue'), port2, 2)
+    if port3=='on' or port3=='off': mqtt.publish(f"trabalho_final_2_iot/%s/devices/port3" % ('blue'), port3, 2)
+    if port4=='on' or port4=='off': mqtt.publish(f"trabalho_final_2_iot/%s/devices/port4" % ('blue'), port4, 2)
+    if port5=='on' or port5=='off': mqtt.publish(f"trabalho_final_2_iot/%s/devices/port5" % ('blue'), port5, 2)
+
+    return '', 204
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
