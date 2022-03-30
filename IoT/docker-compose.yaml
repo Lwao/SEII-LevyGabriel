@@ -16,8 +16,10 @@ services:
     restart: always
     depends_on:
       - mosquitto-broker
-    #volumes: # dev option
-    #  - "C:\\Users\\levyg\\Documents\\MEGA\\Repositories\\SEII-LevyGabriel\\IoT\\webserver:/app"
+    volumes: # dev option
+      - "C:\\Users\\levyg\\Documents\\MEGA\\Repositories\\SEII-LevyGabriel\\IoT\\webserver:/app"
+    ports:
+      - "5000:5000"
     networks:
       - mqtt-internal-network
     environment:
