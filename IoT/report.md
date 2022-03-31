@@ -19,6 +19,13 @@ output:
 
 O presente trabalho, entitulado de aplicação para IoT, tem o objetivo de desenvolver uma interface homem-máquina utilizando Flask, que permitirá o controle de funções de Liga/Desliga de equipamentos de casa. Essa interface é acessada em um navegador por uma segunda máquina. O microcontrolador utilizado foi o ESP32, e para verificar a saída do mesmo, foi utilizado um osciloscópio digital.
 
+<center> 
+
+Figura 1 - Arquitetura proposta inicialmente para o projeto.
+
+![Arquitetura](iot-architecture.jpg)
+</center>
+
 # Módulos utilizados na aplicação
 
 Para o desenvolvimento do firmware, foram utilizados os módulos do ESP-IDF, a interface oficial para o ESP32, as bibliotecas de Wi-Fi para que fosse realizada a conexão sem fio e do MQTT, para que fosse possível se conectar ao servidor broker. Para a interface homem-máquina, foi utilizado o framework Flask, juntando com uma dependência que é o Flask-MQTT, que facilitava a criação de um cliente MQTT em Python.
@@ -32,6 +39,22 @@ O firmware é separado em três arquivos, o `main.c`, `wifi.c` e `mqtt.c`. O arq
 O servidor MQTT pensado inicialmente foi o Mosquitto broker, mas por dificuldades na hora de subir para o heroku, acabou por se utilizar o HiveMQ, um broker público, que pode ser utilizado por qualquer pessoa, por isso inviável para aplicações profissionais.
 
 Por último, o webserver com Flask foi pensado de várias formas, mas acabou sendo um arquivo .py e outro .html. É formado por alguns forms no html onde são escritos "on" ou "off" e enviados ao servidor. Ao lado há imagens que identificam se o comando foi alterado ou não. O arquivo .py tem as funções para subscrever no tópico, enviar mensagens e tratar as mensagens recebidas.
+
+<center> 
+
+Figura 2 - Aplicação do Flask.
+
+![Controle dos pinos](control_center.jpg)
+</center>
+
+Para os testes, foi ultilizado um osciloscópio digital para verificar os sinais de saída do ESP32. Na figura a seguir é possível ver a saída em nível lógico alto após o acionamento usando o Flask.
+
+<center> 
+
+Figura 3 - Osciloscópio mostrando saída do pino em nível alto após acionamento no Flask.
+
+![Osciloscópio](osciloscopio.jpg)
+</center>
 
 # Conclusão
 
